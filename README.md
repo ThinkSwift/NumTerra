@@ -1,3 +1,3 @@
 # NumTerra
 
-GitHub Pages homepage for `numterra.com`.
+GitHub Pages submission homepage for `numterra.com`.

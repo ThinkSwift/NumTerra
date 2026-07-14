@@ -1,205 +1,549 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>NumTerra | 일상 주행 데이터로 싱크홀 위험을 조기 탐지하는 Physical AI 솔루션</title>
-  <meta name="description" content="도로 위 차량을 이동형 감지망으로 바꾸고, 가속도·자이로 신호를 도시 안전 데이터로 전환합니다." />
-  <style>
-    
-* { box-sizing: border-box; }
-:root {
-  color-scheme: dark;
-  --bg: #05070B;
-  --surface: rgba(255, 255, 255, 0.075);
-  --surface-strong: rgba(255, 255, 255, 0.115);
-  --line: rgba(255, 255, 255, 0.14);
-  --text: #F7F8FB;
-  --muted: #B8C1CF;
-  --accent: #55D8FF;
-  --accent2: #FFD166;
-}
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", sans-serif;
-  background:
-    radial-gradient(circle at 12% 0%, color-mix(in srgb, var(--accent) 25%, transparent), transparent 30rem),
-    radial-gradient(circle at 88% 4%, color-mix(in srgb, var(--accent2) 18%, transparent), transparent 34rem),
-    linear-gradient(180deg, #0B0E14 0%, #070910 54%, #040507 100%);
-  color: var(--text);
-  line-height: 1.75;
-}
-.page { width: min(1120px, calc(100% - 34px)); margin: 0 auto; }
-header { padding: 30px 0 56px; }
-.video-wrap {
-  width: min(430px, 100%);
-  margin: 0 auto 34px;
-  border-radius: 8px;
-  border: 1px solid var(--line);
-  overflow: hidden;
-  background: #000;
-  box-shadow: 0 28px 88px rgba(0, 0, 0, 0.42);
-}
-.video-wrap.landscape { width: min(920px, 100%); }
-.video { position: relative; width: 100%; aspect-ratio: 9 / 16; }
-.video-wrap.landscape .video { aspect-ratio: 16 / 9; }
-.video iframe,
-.video video { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-.video video { object-fit: contain; background: #000; }
-h1 { margin: 0; font-size: clamp(35px, 6vw, 70px); line-height: 1.1; letter-spacing: 0; }
-main { padding-bottom: 64px; }
-.qa { display: grid; gap: 18px; padding: 32px 0; border-top: 1px solid var(--line); }
-.question { margin: 0; font-size: clamp(24px, 4vw, 38px); line-height: 1.22; letter-spacing: 0; }
-.answer {
-  white-space: pre-line;
-  margin: 0;
-  padding: 24px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: linear-gradient(180deg, var(--surface-strong), var(--surface));
-  color: #E8EDF5;
-  font-size: 18px;
-}
-.section-images { margin-top: 4px; }
-.image-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-}
-.image-grid.single-image { grid-template-columns: 1fr; }
-figure {
-  margin: 0;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.055);
-}
-figure img {
-  display: block;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  object-fit: contain;
-  background: #111;
-}
-figcaption { padding: 15px; }
-figcaption strong { display: block; margin-bottom: 5px; font-size: 15px; }
-figcaption span { display: block; color: var(--muted); font-size: 13px; line-height: 1.55; }
-@media (max-width: 900px) {
-  header { padding-top: 18px; }
-  .image-grid { grid-template-columns: 1fr; }
-  .answer { font-size: 17px; padding: 19px; }
-}
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NumTerra — 도로가 스스로 위험을 말하게 하다</title>
+<meta name="description" content="일상 주행 데이터로 싱크홀 전조를 조기 탐지하는 Physical AI 플랫폼. 도로 위 모든 차량을 이동형 감지망으로." />
+<meta property="og:title" content="NumTerra — Physical AI 싱크홀 조기감지 플랫폼" />
+<meta property="og:description" content="차량의 가속도·자이로 신호를 도시 안전 데이터로 전환합니다." />
+<meta property="og:image" content="https://numterra.com/assets/logo.png" />
+<meta property="og:url" content="https://numterra.com" />
+<link rel="icon" type="image/png" href="assets/appicon.png" />
+<link rel="apple-touch-icon" href="assets/appicon.png" />
+<link rel="preload" as="image" href="assets/logo.png" />
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #0A0705;
+    --bg2: #120B07;
+    --panel: #17100B;
+    --line: rgba(255, 176, 102, 0.14);
+    --line-soft: rgba(255, 255, 255, 0.07);
+    --text: #FAF3EC;
+    --muted: #B5A79A;
+    --faint: #7E7268;
+    --ember: #FF6B2C;
+    --amber: #FFB340;
+    --lava: #FF3D2E;
+    --cyan: #4FD8EB;
+    --mono: "SF Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    --sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: rgba(255, 107, 44, .35); }
+  img, video { max-width: 100%; display: block; }
+  a { color: inherit; text-decoration: none; }
+  .wrap { width: min(1140px, calc(100% - 48px)); margin: 0 auto; }
 
-    :root { --accent: #26E0C8; --accent2: #FF8A35; }
-  </style>
+  /* ---------- nav ---------- */
+  nav {
+    position: fixed; inset: 0 0 auto; z-index: 50;
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    background: rgba(10, 7, 5, 0.62);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .nav-inner { display: flex; align-items: center; gap: 28px; height: 64px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; letter-spacing: -0.01em; }
+  .brand img { width: 30px; height: 30px; border-radius: 7px; }
+  .brand .terra { color: var(--amber); }
+  .nav-links { display: flex; gap: 24px; margin-left: auto; font-size: 14px; color: var(--muted); }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta {
+    font-size: 13px; font-weight: 700; color: #180C04;
+    background: linear-gradient(135deg, var(--amber), var(--ember));
+    padding: 8px 16px; border-radius: 99px; white-space: nowrap;
+  }
+  @media (max-width: 760px) {
+    .nav-links { display: none; }
+    .nav-cta { margin-left: auto; font-size: 12px; padding: 7px 12px; }
+    .brand { font-size: 16px; }
+  }
+
+  /* ---------- hero ---------- */
+  .hero {
+    position: relative; min-height: 100svh;
+    display: flex; align-items: center;
+    padding: 120px 0 80px;
+    background:
+      radial-gradient(ellipse 55% 45% at 50% 118%, rgba(255, 61, 46, 0.32), transparent),
+      radial-gradient(ellipse 42% 34% at 50% 112%, rgba(255, 140, 40, 0.38), transparent),
+      radial-gradient(circle at 85% 12%, rgba(79, 216, 235, 0.055), transparent 34rem),
+      var(--bg);
+  }
+  .hero::before {  /* perspective road grid */
+    content: ""; position: absolute; inset: auto 0 0; height: 62%;
+    background:
+      linear-gradient(transparent, rgba(255, 120, 50, 0.05)),
+      repeating-linear-gradient(90deg, rgba(255, 160, 90, 0.09) 0 1px, transparent 1px 90px),
+      repeating-linear-gradient(0deg, rgba(255, 160, 90, 0.075) 0 1px, transparent 1px 64px);
+    transform: perspective(560px) rotateX(58deg) scale(1.6);
+    transform-origin: bottom; mask-image: linear-gradient(transparent, #000 62%);
+    -webkit-mask-image: linear-gradient(transparent, #000 62%);
+    pointer-events: none;
+  }
+  .hero-inner { position: relative; display: grid; grid-template-columns: 1.15fr .85fr; gap: 48px; align-items: center; }
+  @media (max-width: 900px) { .hero-inner { grid-template-columns: 1fr; text-align: center; } }
+  .kicker {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--mono); font-size: 12.5px; letter-spacing: .14em;
+    color: var(--amber); text-transform: uppercase;
+    border: 1px solid var(--line); border-radius: 99px; padding: 7px 15px;
+    background: rgba(255, 140, 50, 0.06); margin-bottom: 26px;
+  }
+  .kicker .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ember); box-shadow: 0 0 10px var(--ember); animation: pulse 2.2s infinite; }
+  @keyframes pulse { 50% { opacity: .35; } }
+  h1 {
+    font-size: clamp(40px, 6.2vw, 72px); font-weight: 800;
+    line-height: 1.13; letter-spacing: -0.032em; margin-bottom: 24px;
+  }
+  h1 .glow {
+    background: linear-gradient(105deg, #FFE8B0 5%, var(--amber) 40%, var(--ember) 75%, var(--lava));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero p.lede { font-size: clamp(16px, 2vw, 19px); color: var(--muted); max-width: 46ch; margin-bottom: 38px; }
+  @media (max-width: 900px) { .hero p.lede { margin-inline: auto; } }
+  .cta-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+  @media (max-width: 900px) { .cta-row { justify-content: center; } }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 9px;
+    background: linear-gradient(135deg, var(--amber), var(--ember) 60%, var(--lava));
+    color: #1A0C03; font-weight: 800; font-size: 15.5px;
+    padding: 15px 28px; border-radius: 14px;
+    box-shadow: 0 10px 34px rgba(255, 100, 40, 0.35);
+    transition: transform .25s, box-shadow .25s;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 16px 44px rgba(255, 100, 40, 0.5); }
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 9px;
+    border: 1px solid var(--line); color: var(--text);
+    font-weight: 600; font-size: 15.5px; padding: 15px 26px; border-radius: 14px;
+    background: rgba(255, 255, 255, 0.03); transition: border-color .25s, background .25s;
+  }
+  .btn-ghost:hover { border-color: rgba(255, 176, 102, 0.4); background: rgba(255, 255, 255, 0.06); }
+  .soon-note { font-family: var(--mono); font-size: 12px; color: var(--faint); width: 100%; margin-top: 4px; }
+  .hero-art { position: relative; display: grid; place-items: center; }
+  .hero-art img {
+    width: min(430px, 82%); filter: drop-shadow(0 30px 80px rgba(255, 80, 20, 0.35));
+    animation: float 7s ease-in-out infinite;
+  }
+  @keyframes float { 50% { transform: translateY(-16px) rotate(-1.2deg); } }
+  .hero-art .ring {
+    position: absolute; width: 78%; aspect-ratio: 1; border-radius: 50%;
+    border: 1px solid rgba(255, 150, 70, 0.16);
+    animation: ringspin 14s linear infinite;
+  }
+  .hero-art .ring::before {
+    content: ""; position: absolute; top: -4px; left: 50%; width: 8px; height: 8px;
+    border-radius: 50%; background: var(--cyan); box-shadow: 0 0 14px var(--cyan);
+  }
+  @keyframes ringspin { to { transform: rotate(360deg); } }
+
+  /* ---------- sensor ticker ---------- */
+  .ticker { border-block: 1px solid var(--line-soft); background: var(--bg2); overflow: hidden; }
+  .ticker-track {
+    display: flex; gap: 56px; padding: 14px 0; width: max-content;
+    font-family: var(--mono); font-size: 13px; color: var(--faint);
+    animation: slide 30s linear infinite;
+  }
+  .ticker-track b { color: var(--cyan); font-weight: 500; }
+  .ticker-track em { color: var(--amber); font-style: normal; }
+  @keyframes slide { to { transform: translateX(-50%); } }
+
+  /* ---------- sections ---------- */
+  section { padding: 110px 0; position: relative; }
+  .sec-label { font-family: var(--mono); font-size: 12.5px; letter-spacing: .16em; color: var(--ember); text-transform: uppercase; margin-bottom: 16px; }
+  h2 { font-size: clamp(28px, 4vw, 44px); font-weight: 800; letter-spacing: -0.028em; line-height: 1.22; margin-bottom: 18px; }
+  .sec-lede { color: var(--muted); font-size: 17px; max-width: 62ch; }
+
+  .reveal { opacity: 0; transform: translateY(26px); transition: opacity .8s ease, transform .8s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+
+  /* problem */
+  .problem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; margin-top: 40px; }
+  @media (max-width: 860px) { .problem-grid { grid-template-columns: 1fr; } }
+  .photo-card { position: relative; border-radius: 20px; overflow: hidden; border: 1px solid var(--line-soft); }
+  .photo-card img { width: 100%; aspect-ratio: 4 / 3.4; object-fit: cover; }
+  .photo-card figcaption {
+    position: absolute; inset: auto 0 0; padding: 46px 22px 16px;
+    background: linear-gradient(transparent, rgba(5, 3, 2, 0.88));
+    font-family: var(--mono); font-size: 12px; color: var(--muted);
+  }
+  .prob-points { display: grid; gap: 8px; }
+  .prob-points .item { padding: 20px 0; border-bottom: 1px solid var(--line-soft); }
+  .prob-points .item:last-child { border-bottom: 0; }
+  .prob-points h3 { font-size: 18px; font-weight: 700; margin-bottom: 6px; display: flex; gap: 12px; align-items: baseline; }
+  .prob-points h3 .n { font-family: var(--mono); font-size: 13px; color: var(--ember); }
+  .prob-points p { color: var(--muted); font-size: 15px; }
+
+  /* how it works */
+  .dark-band { background: linear-gradient(180deg, var(--bg2), #0D0806 60%, var(--bg)); border-block: 1px solid var(--line-soft); }
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 48px; counter-reset: step; }
+  @media (max-width: 980px) { .steps { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .steps { grid-template-columns: 1fr; } }
+  .step {
+    position: relative; border: 1px solid var(--line-soft); border-radius: 18px;
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.012));
+    padding: 26px 22px 24px; overflow: hidden;
+    transition: transform .3s, border-color .3s;
+  }
+  .step:hover { transform: translateY(-5px); border-color: rgba(255, 150, 70, 0.35); }
+  .step::after {
+    counter-increment: step; content: "0" counter(step);
+    position: absolute; top: 14px; right: 18px;
+    font-family: var(--mono); font-size: 13px; color: var(--faint);
+  }
+  .step .ico {
+    width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center;
+    background: rgba(255, 120, 45, 0.1); border: 1px solid var(--line);
+    margin-bottom: 18px; font-size: 21px;
+  }
+  .step h3 { font-size: 17.5px; font-weight: 750; margin-bottom: 8px; }
+  .step p { font-size: 14px; color: var(--muted); }
+  .step .tag { display: inline-block; margin-top: 14px; font-family: var(--mono); font-size: 11px; color: var(--cyan); letter-spacing: .06em; }
+
+  /* physical ai */
+  .ai-grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: 52px; align-items: center; margin-top: 44px; }
+  @media (max-width: 900px) { .ai-grid { grid-template-columns: 1fr; } }
+  .lab-card {
+    background: #F4F6F9; border-radius: 18px; padding: 14px;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.08);
+    transform: rotate(-1.1deg);
+  }
+  .lab-card img { border-radius: 10px; }
+  .lab-card .tab {
+    display: flex; justify-content: space-between; align-items: center; padding: 4px 8px 12px;
+    font-family: var(--mono); font-size: 11.5px; color: #5B6B7E;
+  }
+  .lab-card .tab b { color: #C2410C; font-weight: 600; }
+  .ai-list { display: grid; gap: 22px; margin-top: 34px; }
+  .ai-list .row { display: flex; gap: 16px; }
+  .ai-list .bullet {
+    flex: none; width: 34px; height: 34px; border-radius: 10px;
+    display: grid; place-items: center; font-size: 15px;
+    background: rgba(79, 216, 235, 0.08); border: 1px solid rgba(79, 216, 235, 0.25);
+  }
+  .ai-list h3 { font-size: 16.5px; font-weight: 700; margin-bottom: 4px; }
+  .ai-list p { font-size: 14.5px; color: var(--muted); }
+
+  /* app preview */
+  .app-band { background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(255, 110, 40, 0.09), transparent), var(--bg2); border-block: 1px solid var(--line-soft); }
+  .app-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 56px; align-items: center; margin-top: 44px; }
+  @media (max-width: 900px) { .app-grid { grid-template-columns: 1fr; } }
+  .device {
+    position: relative; border-radius: 26px; padding: 12px;
+    background: linear-gradient(160deg, #2A211B, #14100C);
+    border: 1px solid rgba(255, 200, 150, 0.14);
+    box-shadow: 0 34px 90px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  }
+  .device video { border-radius: 16px; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #000; }
+  .device .badge-live {
+    position: absolute; top: 24px; left: 24px; z-index: 2;
+    display: inline-flex; gap: 7px; align-items: center;
+    font-family: var(--mono); font-size: 11px; letter-spacing: .1em;
+    background: rgba(8, 5, 3, 0.72); border: 1px solid var(--line);
+    padding: 6px 12px; border-radius: 99px; color: var(--amber);
+    backdrop-filter: blur(6px);
+  }
+  .badge-live .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--lava); box-shadow: 0 0 8px var(--lava); animation: pulse 1.6s infinite; }
+  .feature-list { display: grid; gap: 10px; margin-top: 30px; }
+  .feature-list .f {
+    display: flex; gap: 14px; align-items: flex-start;
+    border: 1px solid var(--line-soft); border-radius: 14px; padding: 16px 18px;
+    background: rgba(255, 255, 255, 0.025); transition: border-color .3s;
+  }
+  .feature-list .f:hover { border-color: rgba(255, 150, 70, 0.3); }
+  .feature-list .f .em { font-size: 18px; line-height: 1.5; }
+  .feature-list h3 { font-size: 15.5px; font-weight: 700; }
+  .feature-list p { font-size: 13.5px; color: var(--muted); }
+  .store-pill {
+    display: inline-flex; align-items: center; gap: 12px; margin-top: 30px;
+    border: 1px dashed rgba(255, 176, 102, 0.4); border-radius: 16px; padding: 14px 22px;
+  }
+  .store-pill .apple { font-size: 26px; }
+  .store-pill small { display: block; font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; color: var(--faint); text-transform: uppercase; }
+  .store-pill strong { font-size: 15.5px; }
+
+  /* film */
+  .film-inner { display: grid; grid-template-columns: .95fr 1.05fr; gap: 56px; align-items: center; }
+  @media (max-width: 900px) { .film-inner { grid-template-columns: 1fr; } }
+  .phone-frame {
+    width: min(320px, 78%); margin: 0 auto; border-radius: 44px; padding: 12px;
+    background: linear-gradient(160deg, #2A211B, #120E0A);
+    border: 1px solid rgba(255, 200, 150, 0.16);
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.65);
+  }
+  .phone-frame .screen { position: relative; border-radius: 34px; overflow: hidden; aspect-ratio: 9 / 16; background: #000; }
+  .phone-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+  /* roadmap */
+  .road { margin-top: 52px; display: grid; gap: 0; }
+  .road .leg {
+    display: grid; grid-template-columns: 120px 1fr; gap: 26px;
+    padding: 30px 0; border-top: 1px solid var(--line-soft);
+  }
+  .road .leg:last-child { border-bottom: 1px solid var(--line-soft); }
+  @media (max-width: 640px) { .road .leg { grid-template-columns: 1fr; gap: 8px; } }
+  .road .when { font-family: var(--mono); font-size: 13px; color: var(--ember); letter-spacing: .08em; padding-top: 4px; }
+  .road h3 { font-size: 19px; font-weight: 750; margin-bottom: 6px; }
+  .road p { color: var(--muted); font-size: 15px; max-width: 68ch; }
+
+  /* footer */
+  footer { border-top: 1px solid var(--line-soft); padding: 64px 0 46px; background: var(--bg2); }
+  .foot-grid { display: flex; flex-wrap: wrap; gap: 34px; justify-content: space-between; align-items: flex-start; }
+  .foot-brand { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 20px; }
+  .foot-brand img { width: 38px; height: 38px; border-radius: 9px; }
+  .foot-meta { color: var(--faint); font-size: 13.5px; margin-top: 12px; max-width: 44ch; }
+  .foot-links { display: grid; gap: 8px; font-size: 14px; color: var(--muted); }
+  .foot-links a:hover { color: var(--amber); }
+  .copyright { margin-top: 44px; padding-top: 22px; border-top: 1px solid var(--line-soft); font-family: var(--mono); font-size: 12px; color: var(--faint); display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; }
+</style>
 </head>
 <body>
-  <div class="page">
-    <header>
-      <div class="video-wrap portrait">
-        <div class="video">
-          <iframe src="https://www.youtube.com/embed/8tRA3yvEUPM" title="NumTerra YouTube video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+<nav>
+  <div class="wrap nav-inner">
+    <a class="brand" href="#top"><img src="assets/appicon.png" alt="NumTerra 아이콘" /><span>Num<span class="terra">Terra</span></span></a>
+    <div class="nav-links">
+      <a href="#problem">문제</a>
+      <a href="#how">기술</a>
+      <a href="#ai">Physical AI</a>
+      <a href="#app">앱</a>
+      <a href="#roadmap">로드맵</a>
+    </div>
+    <a class="nav-cta" href="#app">App Store 출시 예정</a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap hero-inner">
+    <div>
+      <span class="kicker"><span class="dot"></span>Physical AI · Road Sensing</span>
+      <h1>도로가 스스로<br /><span class="glow">위험을 말하게</span> 하다</h1>
+      <p class="lede">싱크홀은 갑자기 생기지 않습니다. 붕괴 전, 도로는 미세한 신호를 계속 보내고 있습니다. NumTerra는 일상 주행 데이터의 가속도·자이로 신호를 Physical AI로 해석해 싱크홀 전조를 조기에 탐지합니다.</p>
+      <div class="cta-row">
+        <a class="btn-primary" href="#film">▶&nbsp; 데모 영상 보기</a>
+        <a class="btn-ghost" href="#how">기술 살펴보기</a>
+        <span class="soon-note">* iOS 앱은 현재 App Store 출시 준비 중입니다</span>
+      </div>
+    </div>
+    <div class="hero-art">
+      <div class="ring"></div>
+      <img src="assets/logo.png" alt="NumTerra 로고 — 도로 아래 열 신호를 형상화한 3D 심벌" />
+    </div>
+  </div>
+</header>
+
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track" id="ticker">
+    <span>acc <b>+0.02 g</b></span><span>gyro <b>-0.04 rad/s</b></span><span>speed <b>62 km/h</b></span><span>status <em>STABLE</em></span><span>segment <b>#04-117</b></span><span>risk <em>LOW</em></span><span>acc <b>+1.34 g</b></span><span>gyro <b>-1.81 rad/s</b></span><span>status <em>SPIKE</em></span><span>risk <em>REVIEW</em></span><span>uplink <b>OK</b></span><span>model <b>PA-v2</b></span>
+  </div>
+</div>
+
+<section id="problem">
+  <div class="wrap">
+    <p class="sec-label reveal">The Problem</p>
+    <h2 class="reveal">위험은 존재합니다.<br />관측되지 않을 뿐입니다.</h2>
+    <p class="sec-lede reveal">싱크홀은 도로 아래 지반 변화가 오랫동안 누적되다 어느 순간 붕괴로 드러나는 도시 재난입니다. 문제의 본질은 위험이 없는 것이 아니라 — 충분히 자주, 충분히 넓게, 충분히 낮은 비용으로 관측할 수 없다는 데 있습니다.</p>
+    <div class="problem-grid">
+      <figure class="photo-card reveal">
+        <img src="assets/sinkhole.jpg" alt="도로를 삼킨 대형 싱크홀 현장" loading="lazy" />
+        <figcaption>2025 — 서울 도심 대형 싱크홀 현장. 붕괴는 결과일 뿐, 전조는 그 전부터 존재했습니다.</figcaption>
+      </figure>
+      <div class="prob-points reveal">
+        <div class="item">
+          <h3><span class="n">01</span>정밀 점검은 드물다</h3>
+          <p>GPR 등 정밀 탐사는 정확하지만 인력·장비·예산 제약으로 주기적일 수밖에 없습니다. 도로는 매일 변합니다.</p>
+        </div>
+        <div class="item">
+          <h3><span class="n">02</span>전조는 노이즈에 묻힌다</h3>
+          <p>싱크홀 전조는 맨홀, 포트홀, 과속방지턱, 일반 요철 같은 방해 신호 속에 섞여 사람 눈으로는 구분되지 않습니다.</p>
+        </div>
+        <div class="item">
+          <h3><span class="n">03</span>점검 예산은 흩어진다</h3>
+          <p>위험 의심 구간을 미리 좁히지 못하면 예산과 인력은 넓게 분산되고, 실제 위험 구간의 발견은 늦어집니다.</p>
         </div>
       </div>
-    </header>
-    <main>
-
-      <section class="qa">
-        <h2 class="question">Q1. 나의 아이디어를 한 줄로 소개해주세요.</h2>
-        <p class="answer">도시가 스스로 위험을 감지하게 만드는, 차량 주행 데이터 기반 싱크홀 조기감지 Physical AI 플랫폼입니다.</p>
-
-      </section>
-        
-
-      <section class="qa">
-        <h2 class="question">Q2. 아이디어를 떠올린 배경 이야기를 들려주세요.</h2>
-        <p class="answer">싱크홀은 갑자기 생기는 사고처럼 보이지만, 실제로는 도로 아래 지반과 포장층의 변화가 누적되다가 어느 순간 붕괴로 드러나는 도시 재난입니다. 문제는 위험이 존재하지 않는 것이 아니라, 그 위험을 충분히 자주, 충분히 넓게, 충분히 낮은 비용으로 관측하기 어렵다는 데 있습니다.
-
-기존 점검은 정밀하지만 인력, 장비, 예산의 제약 때문에 주기적으로 이루어질 수밖에 없습니다. 그러나 도로는 매일 변하고, 싱크홀 전조는 정상 주행, 맨홀, 포트홀, 과속방지턱, 노면 요철 같은 방해 신호 속에 섞여 나타납니다. 그래서 필요한 것은 더 비싼 일회성 점검만이 아니라, 이미 도로 위를 달리고 있는 차량을 이동형 감지망으로 바꾸는 새로운 관측 방식입니다.</p>
-
-        <div class="image-grid single-image section-images">
-
-          <figure>
-            <img src="assets/fig1.png" alt="싱크홀 이미지" loading="lazy" />
-            <figcaption><strong>그림 1. 싱크홀 이미지</strong><span>싱크홀은 한 번 발생하면 도로 붕괴, 교통마비, 인명·재산 피해를 동시에 만드는 고위험 도시 재난입니다. NumTerra는 사고 이후 대응이 아니라 사고 이전의 전조 탐지를 목표로 합니다.</span></figcaption>
-          </figure>
-        
-        </div>
-
-        <p class="answer">이 문제의식을 바탕으로 서울대 학부생 심화연구 혁신 인재 지원사업에 싱크홀 전조 탐지 아이템으로 지원했고, 예선 합격을 경험했습니다. 이번 아이디어는 당시의 문제의식을 보완해 더 실현 가능한 사업 구조로 발전시킨 것입니다. 핵심은 붕괴 시점 직전의 큰 이상만 찾는 것이 아니라, 그보다 앞서 반복적으로 누적되는 미세한 싱크홀 패턴을 읽어내는 데 있습니다.</p>
-
-        <div class="image-grid single-image section-images">
-
-          <figure>
-            <img src="assets/fig2.png" alt="싱크홀 전조와 붕괴시점 그래프" loading="lazy" />
-            <figcaption><strong>그림 2. 싱크홀 전조와 붕괴시점 그래프</strong><span>붕괴 시점에 가까워질수록 도로 반응의 이상 신호가 비선형적으로 커질 수 있음을 보여주는 개념 그래프입니다. NumTerra가 집중하는 영역은 붕괴 이후가 아니라, 아직 사람이 체감하기 어려운 전조 구간입니다.</span></figcaption>
-          </figure>
-        
-        </div>
-        
-      </section>
-        
-
-      <section class="qa">
-        <h2 class="question">Q3. 아이디어는 누구의 어떤 문제를 해결해주나요?</h2>
-        <p class="answer">해결하려는 문제는 도로 안전 관리의 관측 공백입니다. 지자체, 도로관리기관, 공공 인프라 운영기관은 넓은 도로망을 관리해야 하지만 모든 구간을 상시 정밀 점검하기 어렵습니다. 위험 의심 구간을 미리 좁히지 못하면 점검 예산과 인력은 넓게 흩어지고, 실제 위험 구간은 늦게 발견될 수 있습니다.
-
-이 문제를 풀기 위해 구상한 서비스가 NumTerra입니다. NumTerra라는 이름은 수치 신호를 뜻하는 Num과 땅, 지반, 도로 환경을 뜻하는 Terra를 결합한 것입니다. 즉 NumTerra는 차량이 매일 만들어내는 수치 신호를 지반과 도로의 위험 정보로 해석하는 브랜드입니다. 단순한 신고 앱이 아니라, 도로 위의 흔들림과 차량 물리를 학습해 도시 안전 데이터를 만드는 Physical AI 서비스라는 의미를 담았습니다.</p>
-
-        <div class="image-grid single-image section-images">
-
-          <figure>
-            <img src="assets/fig3.png" alt="NumTerra 브랜드 소개" loading="lazy" />
-            <figcaption><strong>그림 3. NumTerra 브랜드 소개</strong><span>NumTerra는 수치 신호와 지반·도로 환경을 결합한 이름입니다. 로고는 도로, 지반, AI 신호가 하나의 도시 안전 데이터로 연결된다는 서비스 방향을 표현합니다.</span></figcaption>
-          </figure>
-        
-        </div>
-
-        <p class="answer">초기 고객은 지자체와 도로관리기관, 공공 인프라 운영기관입니다. NumTerra는 정밀 탐사를 대체하는 장비가 아니라, 어디를 먼저 점검해야 하는지 알려주는 조기 선별 레이어입니다. 공공기관은 넓은 도로망에서 위험 후보 구간을 더 빠르게 좁힐 수 있고, 점검 예산과 인력을 더 설득력 있게 배치할 수 있습니다.
-
-핵심 기술은 미세한 싱크홀 패턴 탐지입니다. 같은 도로를 달려도 차량의 속도, 무게, 타이어, 노면 상태에 따라 센서 반응은 달라지기 때문에 단순한 충격 감지만으로는 충분하지 않습니다. NumTerra는 먼저 도로 정보와 차량 물리를 Physical AI로 학습시켜 정상 주행 반응과 이상 반응을 구분하고, 이후 실제 주행 데이터가 쌓일수록 위험 후보 구간을 더 정교하게 갱신하는 방식으로 발전합니다.</p>
-        
-      </section>
-        
-
-      <section class="qa">
-        <h2 class="question">Q4. 아이디어를 어떻게 실현하고 싶으신가요?</h2>
-        <p class="answer">실현 전략은 앱 기반 데이터 수집, 차량 물리와 도로 정보 학습, 위험 후보 구간 분석, B2G 매출화, B2C 확장 순서로 진행하려고 합니다.
-
-먼저 Physical AI 기반 앱을 출시 준비 중입니다. 앱은 주행 중 speed, acc, gyro, 위치, 시간 데이터를 수집하고, 같은 구간을 반복 주행하면서 도로의 평상시 반응을 학습합니다. 이때 단순히 흔들림이 큰 구간을 표시하는 것이 아니라, 차량 속도와 물리 반응을 함께 고려해 과속방지턱, 맨홀, 포트홀, 일반 요철과 싱크홀 전조 후보를 구분하는 방향으로 설계합니다.</p>
-
-        <div class="image-grid single-image section-images">
-
-          <figure>
-            <img src="assets/fig4.png" alt="Physical AI 기반 앱 출시 예정" loading="lazy" />
-            <figcaption><strong>그림 4. Physical AI 기반 앱 출시 예정</strong><span>출시 예정 앱은 차량 주행 중 발생하는 센서 신호를 수집하고, Physical AI 모델과 연결해 도로 위험 후보를 분석하는 핵심 접점입니다. 앱 화면은 데이터 수집, 차량 물리 학습, 위험 신호 탐지로 이어지는 서비스 구조를 보여줍니다.</span></figcaption>
-          </figure>
-        
-        </div>
-
-        <p class="answer">초기 매출은 B2G 방식으로 만들고자 합니다. 지자체와 도로관리기관을 대상으로 위험 후보 구간 리포트, 정기 모니터링 대시보드, 실증 프로젝트를 제공하고, 이후 도로 유지보수 업체와 공공 인프라 운영기관으로 확장할 수 있습니다. 공공기관 입장에서는 모든 도로를 무작위로 점검하는 것보다, 데이터로 의심 구간을 좁힌 뒤 정밀 탐사를 투입하는 방식이 예산과 책임 측면에서 설득력이 있습니다.
-
-그 다음 단계에서는 B2C 기반 사용자 편의성을 추가합니다. 운전자에게 위험 의심 구간 알림, 안전 경로 안내, 지역 도로 상태 정보, 시민 제보 기능을 제공하고, 충분한 데이터가 쌓이면 도시 단위 도로 안전 데이터 플랫폼으로 확장할 수 있습니다.
-
-싱크홀의 문제는 보이지 않는 것 자체가 아니라 상시 관측되지 않는 것에 가깝습니다. NumTerra는 이 관측 공백을 차량 데이터와 Physical AI로 메우고, 대표자의 전기정보공학 기반 신호처리와 수치해석 역량, AI 모델링 역량을 결합해 단순한 아이디어가 아니라 실제 앱과 데이터 사업으로 이어지는 서비스를 만들고자 합니다.</p>
-        
-      </section>
-        
-
-      <section class="qa">
-        <h2 class="question">Q5. 사업 분야를 선택해주세요.</h2>
-        <p class="answer">IT</p>
-
-      </section>
-        
-
-      <section class="qa">
-        <h2 class="question">Q8. 나의 아이디어를 소개하는 영상을 링크로 제출해주세요.</h2>
-        <p class="answer">https://youtube.com/shorts/8tRA3yvEUPM</p>
-
-      </section>
-        
-    </main>
+    </div>
   </div>
+</section>
+
+<section id="how" class="dark-band">
+  <div class="wrap">
+    <p class="sec-label reveal">How It Works</p>
+    <h2 class="reveal">달리는 모든 차량이<br />이동형 감지망이 됩니다</h2>
+    <p class="sec-lede reveal">더 비싼 일회성 점검이 아니라, 이미 도로 위를 달리는 차량으로 상시 관측망을 만듭니다. 신호처리 + Physical AI + 크라우드 데이터 누적의 4단계 파이프라인입니다.</p>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="ico">📡</div>
+        <h3>주행 데이터 수집</h3>
+        <p>스마트폰 센서로 주행 중 가속도·자이로·속도·위치·시간을 수집하고, 반복 주행 구간을 확보합니다.</p>
+        <span class="tag">acc / gyro / gps / speed</span>
+      </div>
+      <div class="step reveal">
+        <div class="ico">〰️</div>
+        <h3>신호 정규화</h3>
+        <p>Fourier·Laplace 기반 해석으로 노이즈를 제거하고 이벤트를 분리하며, 차량 간 편차를 보정합니다.</p>
+        <span class="tag">fourier / laplace</span>
+      </div>
+      <div class="step reveal">
+        <div class="ico">🧠</div>
+        <h3>Physical AI 학습</h3>
+        <p>도로·차량·지반 조건을 시뮬레이션해 희소한 싱크홀 전조 데이터를 보완하고 사전 학습합니다.</p>
+        <span class="tag">simulation-first</span>
+      </div>
+      <div class="step reveal">
+        <div class="ico">🗺️</div>
+        <h3>크라우드 누적 탐지</h3>
+        <p>같은 구간의 반복 데이터를 누적해 위치별 기준 신호를 만들고, 위험 구간을 조기에 식별합니다.</p>
+        <span class="tag">crowd baseline</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="ai">
+  <div class="wrap">
+    <p class="sec-label reveal">Physical AI</p>
+    <h2 class="reveal">사람 눈에는 안 보여도,<br />모델에는 보입니다</h2>
+    <div class="ai-grid">
+      <div class="reveal">
+        <p class="sec-lede">단일 주행의 raw 파형에서 싱크홀 전조는 판별이 불가능합니다. 그러나 반복 관측을 정렬·누적하면 약한 공통 패턴이 드러나고, 신경망 risk score는 전조 위치에서만 상승합니다.</p>
+        <div class="ai-list">
+          <div class="row">
+            <div class="bullet">🌊</div>
+            <div><h3>넓고 약한 저주파 함몰 신호</h3><p>포트홀의 짧고 강한 충격과 달리, 싱크홀 전조는 넓고 약한 저주파 패턴으로 나타납니다.</p></div>
+          </div>
+          <div class="row">
+            <div class="bullet">🚗</div>
+            <div><h3>차량 물리를 아는 모델</h3><p>속도·무게·타이어에 따라 달라지는 센서 반응을 물리 시뮬레이션으로 학습해 정상/이상을 구분합니다.</p></div>
+          </div>
+          <div class="row">
+            <div class="bullet">📈</div>
+            <div><h3>쌓일수록 정교해지는 지도</h3><p>실주행 데이터가 누적될수록 위험 후보 구간이 더 정밀하게 갱신됩니다.</p></div>
+          </div>
+        </div>
+      </div>
+      <figure class="lab-card reveal">
+        <div class="tab"><b>● physical_ai_demo</b><span>train acc 1.000 · risk score inference</span></div>
+        <img src="assets/ai-demo.png" alt="복합 가속도 환경에서 신경망이 싱크홀 전조를 감지하는 Physical AI 데모 차트" loading="lazy" />
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section id="app" class="app-band">
+  <div class="wrap">
+    <p class="sec-label reveal">The App</p>
+    <h2 class="reveal">주행이 곧 기여가 되는<br />NumTerra 앱</h2>
+    <p class="sec-lede reveal">실시간 센서 HUD로 내 주행의 acc·gyro·speed를 확인하고, 달리는 것만으로 도시의 도로 안전 데이터에 기여합니다.</p>
+    <div class="app-grid">
+      <div class="device reveal">
+        <span class="badge-live"><span class="dot"></span>LIVE SENSOR HUD</span>
+        <video autoplay muted loop playsinline preload="metadata" poster="assets/poster.jpg">
+          <source src="assets/drive-loop.mp4" type="video/mp4" />
+        </video>
+      </div>
+      <div class="reveal">
+        <div class="feature-list">
+          <div class="f"><span class="em">⚡️</span><div><h3>실시간 센서 텔레메트리</h3><p>가속도·자이로·속도를 실시간 그래프로 시각화하고 SPIKE 이벤트를 즉시 포착합니다.</p></div></div>
+          <div class="f"><span class="em">🛰️</span><div><h3>구간별 위험 신호 맵</h3><p>반복 주행으로 누적된 구간별 기준 신호와 위험 후보 구간을 지도로 확인합니다.</p></div></div>
+          <div class="f"><span class="em">🤝</span><div><h3>시민 검증 리포트</h3><p>이웃의 제보와 검증으로 위험 후보의 신뢰도를 함께 끌어올립니다.</p></div></div>
+        </div>
+        <div class="store-pill">
+          <span class="apple"></span>
+          <div><small>Coming soon on the</small><strong>App Store — 출시 준비 중</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="film">
+  <div class="wrap film-inner">
+    <div class="phone-frame reveal">
+      <div class="screen">
+        <iframe src="https://www.youtube.com/embed/8tRA3yvEUPM" title="NumTerra 소개 영상" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      </div>
+    </div>
+    <div class="reveal">
+      <p class="sec-label">Film</p>
+      <h2>60초로 보는<br />NumTerra</h2>
+      <p class="sec-lede">차량 주행 데이터가 어떻게 도시 안전 데이터가 되는지, 1분짜리 소개 영상으로 확인하세요.</p>
+    </div>
+  </div>
+</section>
+
+<section id="roadmap" class="dark-band">
+  <div class="wrap">
+    <p class="sec-label reveal">Roadmap</p>
+    <h2 class="reveal">데이터에서 플랫폼까지</h2>
+    <div class="road">
+      <div class="leg reveal">
+        <span class="when">PHASE 01</span>
+        <div><h3>iOS 앱 출시 & 데이터 수집</h3><p>Physical AI 기반 앱을 출시하고, 반복 주행 데이터로 도로의 평상시 반응을 학습합니다. 속도·차량 물리를 함께 고려해 과속방지턱·맨홀·포트홀과 싱크홀 전조 후보를 구분합니다.</p></div>
+      </div>
+      <div class="leg reveal">
+        <span class="when">PHASE 02</span>
+        <div><h3>B2G — 공공기관 조기 선별 레이어</h3><p>지자체·도로관리기관에 위험 후보 구간 리포트, 정기 모니터링 대시보드, 실증 프로젝트를 제공합니다. 정밀 탐사를 대체하는 것이 아니라, 어디를 먼저 점검해야 하는지 알려줍니다.</p></div>
+      </div>
+      <div class="leg reveal">
+        <span class="when">PHASE 03</span>
+        <div><h3>B2C — 운전자 안전 서비스</h3><p>위험 의심 구간 알림, 안전 경로 안내, 지역 도로 상태 정보, 시민 제보 기능으로 확장합니다.</p></div>
+      </div>
+      <div class="leg reveal">
+        <span class="when">PHASE 04</span>
+        <div><h3>도시 단위 도로 안전 데이터 플랫폼</h3><p>물류·모빌리티·보험 파트너를 위한 API/데이터 라이선스로 확장해, 도시가 스스로 위험을 감지하는 인프라가 됩니다.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand"><img src="assets/appicon.png" alt="" /><span>Num<span style="color:var(--amber)">Terra</span></span></div>
+        <p class="foot-meta">Num(수치 신호) × Terra(지반·도로). 차량이 매일 만들어내는 수치 신호를 지반과 도로의 위험 정보로 해석하는 Physical AI 브랜드입니다.</p>
+      </div>
+      <div class="foot-links">
+        <a href="#problem">문제</a>
+        <a href="#how">기술</a>
+        <a href="#app">앱</a>
+        <a href="#roadmap">로드맵</a>
+      </div>
+      <div class="foot-links">
+        <a href="mailto:hello@swiftian.com">hello@swiftian.com</a>
+        <a href="https://youtube.com/shorts/8tRA3yvEUPM" target="_blank" rel="noopener">YouTube</a>
+      </div>
+    </div>
+    <div class="copyright">
+      <span>© 2026 NumTerra. All rights reserved.</span>
+      <span>SENSING THE GROUND BENEATH · 도로 아래를 감지하다</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // scroll reveal
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  // duplicate ticker content for seamless loop
+  const t = document.getElementById('ticker');
+  t.innerHTML += t.innerHTML;
+</script>
+
 </body>
 </html>

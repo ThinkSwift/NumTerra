@@ -1,346 +1,122 @@
 <!doctype html>
 <html lang="ko">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>NumTerra — 내 동네 도로의 위험, 내가 먼저 찾는다</title>
-<meta name="description" content="주행하면 폰이 도로 충격을 기록하고, 이웃의 검증으로 내 동네 위험 지도가 완성됩니다. Physical AI로 학습하는 도로 안전 앱, NumTerra." />
-<meta property="og:title" content="NumTerra — 내 동네 도로 위험 지도" />
-<meta property="og:description" content="주행이 기록이 되고, 이웃의 검증으로 사실이 되는 도로 안전 앱." />
-<meta property="og:image" content="https://numterra.com/assets/logo.png" />
-<meta property="og:url" content="https://numterra.com" />
-<link rel="icon" type="image/png" href="assets/appicon.png" />
-<link rel="apple-touch-icon" href="assets/appicon.png" />
-<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NumTerra — 우리 동네가 먼저 안다</title>
+<meta name="description" content="싱크홀은 갑자기 생기지 않는다. 갑자기 드러날 뿐이다. 매일 그 길을 지나는 사람들과, 그들의 주머니 속 센서가 먼저 알아채는 방법에 관한 연재.">
+<meta property="og:title" content="NumTerra — 우리 동네가 먼저 안다">
+<meta property="og:description" content="싱크홀은 갑자기 생기지 않는다. 갑자기 드러날 뿐이다. 매일 그 길을 지나는 사람들과, 그들의 주머니 속 센서가 먼저 알아채는 방법에 관한 연재.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#fbfaf7">
+<link rel="icon" href="/assets/logo.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap">
 <style>
-  :root {
-    color-scheme: dark;
-    --bg: #05070B;
-    --bg2: #080B12;
-    --line: rgba(255, 255, 255, 0.08);
-    --text: #F2F6F8;
-    --muted: #93A1AC;
-    --faint: #5C6873;
-    --scan: #23E0C8;            /* app identity cyan */
-    --amber: #FFC24D;
-    --orange: #FF8A1E;
-    --red: #FF3B4E;
-    --mono: "SF Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-    --sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
-  body {
-    font-family: var(--sans);
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.7;
-    overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
-  }
-  ::selection { background: rgba(35, 224, 200, .3); }
-  img, video { max-width: 100%; display: block; }
-  a { color: inherit; text-decoration: none; }
-  .wrap { width: min(1080px, calc(100% - 48px)); margin: 0 auto; }
+:root{
+  --bg:#fbfaf7; --paper:#fff; --line:#e6e1d8; --line2:#d8d2c6;
+  --fg:#1c1b19; --dim:#6b665e; --faint:#98928a;
+  --accent:#b4451f; --accent-soft:#f4ece7;
+  --serif:"Nanum Myeongjo",'Apple SD Gothic Neo',Georgia,serif;
+  --sans:Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);
+  font-size:19px;line-height:1.9;letter-spacing:-.004em;-webkit-font-smoothing:antialiased}
+a{color:var(--fg);text-decoration:none}
+.wrap{max-width:700px;margin:0 auto;padding:0 26px}
 
-  /* ---------- nav ---------- */
-  nav {
-    position: fixed; inset: 0 0 auto; z-index: 50;
-    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-    background: rgba(5, 7, 11, 0.7);
-    border-bottom: 1px solid var(--line);
-  }
-  .nav-inner { display: flex; align-items: center; height: 62px; }
-  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 17px; }
-  .brand img { width: 28px; height: 28px; border-radius: 7px; }
-  .brand .t { color: var(--scan); }
-  .nav-pill {
-    margin-left: auto;
-    font-family: var(--mono); font-size: 12px; letter-spacing: .04em;
-    color: var(--scan); border: 1px solid rgba(35, 224, 200, 0.35);
-    background: rgba(35, 224, 200, 0.07);
-    padding: 7px 14px; border-radius: 99px; white-space: nowrap;
-  }
+/* header */
+header{border-bottom:1px solid var(--line);background:var(--bg)}
+.hd{display:flex;align-items:baseline;justify-content:space-between;height:76px}
+.brand{font-family:var(--serif);font-size:24px;font-weight:700;letter-spacing:-.02em}
+nav a{font-size:15px;color:var(--dim);margin-left:24px}
+nav a:hover{color:var(--accent)}
 
-  /* ---------- hero ---------- */
-  .hero { position: relative; padding: 150px 0 90px; }
-  .hero::before {
-    content: ""; position: absolute; inset: 0; pointer-events: none;
-    background:
-      radial-gradient(ellipse 60% 44% at 78% 20%, rgba(35, 224, 200, 0.10), transparent),
-      radial-gradient(ellipse 42% 30% at 12% 82%, rgba(255, 138, 30, 0.06), transparent);
-  }
-  .hero-inner { position: relative; display: grid; grid-template-columns: 1.08fr .92fr; gap: 56px; align-items: center; }
-  @media (max-width: 880px) { .hero-inner { grid-template-columns: 1fr; text-align: center; } }
-  .kicker {
-    display: inline-flex; align-items: center; gap: 8px;
-    font-family: var(--mono); font-size: 12px; letter-spacing: .14em;
-    color: var(--scan); text-transform: uppercase; margin-bottom: 24px;
-  }
-  .kicker .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--scan); box-shadow: 0 0 10px var(--scan); animation: pulse 2.4s infinite; }
-  @keyframes pulse { 50% { opacity: .3; } }
-  h1 {
-    font-size: clamp(36px, 5.6vw, 60px); font-weight: 800;
-    line-height: 1.18; letter-spacing: -0.032em; margin-bottom: 22px;
-  }
-  h1 .c { color: var(--scan); text-shadow: 0 0 34px rgba(35, 224, 200, .45); }
-  .lede { font-size: clamp(16px, 1.9vw, 18.5px); color: var(--muted); max-width: 46ch; margin-bottom: 34px; }
-  @media (max-width: 880px) { .lede { margin-inline: auto; } }
-  .cta-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
-  @media (max-width: 880px) { .cta-row { justify-content: center; } }
-  .btn-store {
-    display: inline-flex; align-items: center; gap: 11px;
-    border: 1px dashed rgba(35, 224, 200, 0.45); border-radius: 14px;
-    padding: 12px 22px; background: rgba(35, 224, 200, 0.05);
-  }
-  .btn-store .apple { color: var(--text); flex: none; }
-  .btn-store small { display: block; font-family: var(--mono); font-size: 10px; letter-spacing: .12em; color: var(--faint); text-transform: uppercase; }
-  .btn-store strong { font-size: 15px; }
-  .hero-stats { display: flex; gap: 30px; margin-top: 40px; }
-  .hs b { display: block; font-family: var(--mono); font-size: 20px; color: var(--text); font-weight: 600; white-space: nowrap; }
-  .hs b i { font-style: normal; color: var(--scan); }
-  .hs span { font-size: 12.5px; color: var(--faint); }
-  @media (max-width: 880px) {
-    .hero-stats { justify-content: center; gap: 20px; }
-    .hs b { font-size: 15px; }
-    .hs span { font-size: 11px; }
-  }
+/* index hero */
+.hero{padding:80px 0 52px}
+.kicker{font-size:13px;letter-spacing:.14em;color:var(--accent);text-transform:uppercase;
+  font-weight:600;margin-bottom:22px}
+.hero h1{font-family:var(--serif);font-size:46px;line-height:1.28;margin:0 0 22px;
+  letter-spacing:-.03em;font-weight:700}
+.hero p{color:var(--dim);font-size:18px;line-height:1.8;margin:0;max-width:40em}
+.rule{height:1px;background:var(--line2);margin:0}
 
-  /* ---------- phone frame ---------- */
-  .phone {
-    width: min(320px, 80vw); margin: 0 auto;
-    border-radius: 46px; padding: 11px;
-    background: linear-gradient(165deg, #1B2129, #0B0E13 65%);
-    border: 1px solid rgba(148, 180, 190, 0.16);
-    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.65), 0 0 80px rgba(35, 224, 200, 0.05);
-  }
-  .phone .screen { border-radius: 36px; overflow: hidden; background: #000; position: relative; }
-  .phone.small { width: min(290px, 76vw); }
-  .glow-under { position: relative; }
-  .glow-under::after {
-    content: ""; position: absolute; inset: auto 8% -34px; height: 60px;
-    background: radial-gradient(ellipse, rgba(35, 224, 200, 0.22), transparent 70%);
-    filter: blur(12px); z-index: -1;
-  }
+/* post list */
+.list{padding:0 0 90px}
+.item{display:block;padding:38px 0;border-bottom:1px solid var(--line)}
+.item:hover .t{color:var(--accent)}
+.no{font-size:12.5px;letter-spacing:.14em;color:var(--accent);font-weight:600}
+.t{font-family:var(--serif);font-size:27px;font-weight:700;margin:10px 0 12px;
+  letter-spacing:-.022em;line-height:1.35;transition:color .15s}
+.ex{color:var(--dim);font-size:17px;line-height:1.8;margin:0}
+.meta{font-size:13.5px;color:var(--faint);margin-top:14px}
 
-  /* ---------- story ---------- */
-  section { padding: 96px 0; }
-  .story { border-top: 1px solid var(--line); }
-  .story-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  @media (max-width: 880px) { .story-grid { grid-template-columns: 1fr; gap: 40px; } .story-grid .txt { text-align: center; } }
-  .story-grid.flip .media { order: -1; }
-  @media (max-width: 880px) { .story-grid.flip .media { order: 0; } }
-  .step-label {
-    font-family: var(--mono); font-size: 12px; letter-spacing: .16em;
-    text-transform: uppercase; margin-bottom: 14px; display: block;
-  }
-  h2 { font-size: clamp(26px, 3.6vw, 38px); font-weight: 800; letter-spacing: -0.028em; line-height: 1.26; margin-bottom: 16px; }
-  .story p.body { color: var(--muted); font-size: 16.5px; max-width: 50ch; }
-  @media (max-width: 880px) { .story p.body { margin-inline: auto; } }
-  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
-  @media (max-width: 880px) { .chips { justify-content: center; } }
-  .chip {
-    font-family: var(--mono); font-size: 12px; color: var(--muted);
-    border: 1px solid var(--line); border-radius: 99px; padding: 6px 13px;
-    background: rgba(255, 255, 255, 0.025);
-  }
-  .chip b { color: var(--scan); font-weight: 500; }
+/* article */
+article{padding:64px 0 40px}
+.a-kicker{font-size:13px;letter-spacing:.14em;color:var(--accent);text-transform:uppercase;
+  font-weight:600;margin-bottom:18px}
+article h1{font-family:var(--serif);font-size:42px;line-height:1.26;margin:0 0 20px;
+  letter-spacing:-.03em;font-weight:700}
+.a-meta{font-size:14px;color:var(--faint);padding-bottom:32px;
+  border-bottom:1px solid var(--line2);margin-bottom:40px}
+.body h2{font-family:var(--serif);font-size:28px;margin:58px 0 18px;
+  letter-spacing:-.022em;font-weight:700;line-height:1.4}
+.body h3{font-size:20px;margin:38px 0 12px;font-weight:650}
+.body p{margin:0 0 24px}
+.body strong{font-weight:700}
+.body em{font-style:italic;color:var(--dim)}
+.body ul,.body ol{padding-left:24px;margin:0 0 24px}
+.body li{margin-bottom:9px}
+.body blockquote{margin:32px 0;padding:22px 26px;background:var(--accent-soft);
+  border-radius:3px;font-family:var(--serif);font-size:20px;line-height:1.75;color:#4a3b33}
+.body blockquote p{margin:0 0 12px}
+.body blockquote p:last-child{margin:0}
+.body blockquote blockquote{background:none;padding:0 0 0 18px;
+  border-left:3px solid var(--accent);margin:12px 0;font-size:19px}
+.body code{font-family:ui-monospace,Menlo,monospace;font-size:.86em;
+  background:#f0ece5;border-radius:3px;padding:2px 6px}
+.body pre{background:#f5f2ec;border:1px solid var(--line);border-radius:6px;
+  padding:18px;overflow-x:auto;margin:28px 0}
+.body pre code{background:none;padding:0;font-size:14.5px;line-height:1.7}
+.body hr{border:0;border-top:1px solid var(--line2);margin:48px 0}
+.body img{max-width:100%;height:auto;margin:30px 0;border-radius:3px}
+.body figcaption,.body img+em{display:block;font-size:14.5px;color:var(--faint);
+  text-align:center;margin-top:-18px}
+.body table{width:100%;border-collapse:collapse;margin:28px 0;font-size:16.5px;
+  display:block;overflow-x:auto}
+.body th,.body td{border-bottom:1px solid var(--line);padding:11px 12px;text-align:left}
+.body th{border-bottom:2px solid var(--line2);font-weight:700}
 
-  .formula-card {
-    margin-top: 24px; border: 1px solid rgba(35, 224, 200, 0.22); border-radius: 14px;
-    background: linear-gradient(170deg, rgba(35, 224, 200, 0.05), rgba(255, 255, 255, 0.01));
-    padding: 18px 20px; max-width: 480px;
-  }
-  @media (max-width: 880px) { .formula-card { margin-inline: auto; text-align: left; } }
-  .formula-card .fh { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; color: var(--faint); letter-spacing: .08em; margin-bottom: 10px; }
-  .formula-card .fh b { color: var(--scan); font-weight: 500; }
-  .formula-card code {
-    font-family: var(--mono); font-size: clamp(13.5px, 1.8vw, 15.5px);
-    color: var(--scan); display: block; line-height: 1.6; word-break: break-all;
-  }
-  .formula-card code .op { color: var(--amber); }
-  .formula-card .fn { margin-top: 10px; font-size: 12.5px; color: var(--faint); }
+/* footer nav */
+.pnav{display:flex;justify-content:space-between;gap:18px;
+  border-top:1px solid var(--line2);padding:32px 0 0;margin-top:52px}
+.pnav a{font-family:var(--serif);font-size:18px;max-width:46%;line-height:1.45}
+.pnav a:hover{color:var(--accent)}
+.pnav .lbl{display:block;font-family:var(--sans);font-size:12px;color:var(--faint);
+  letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;font-weight:600}
+footer{border-top:1px solid var(--line);margin-top:72px;padding:32px 0 56px;
+  color:var(--faint);font-size:14px}
 
-  /* verify votes visual */
-  .verdict { display: inline-flex; align-items: center; gap: 8px; margin-top: 22px; font-weight: 700; font-size: 15px; color: var(--scan); }
-  .verdict .badge { width: 20px; height: 20px; border-radius: 50%; background: rgba(35,224,200,.15); display: grid; place-items: center; font-size: 11px; }
-
-  /* ---------- future / physical ai ---------- */
-  .future { border-top: 1px solid var(--line); background: linear-gradient(180deg, var(--bg2), var(--bg)); text-align: center; }
-  .future .sub { color: var(--muted); font-size: 16.5px; max-width: 58ch; margin: 0 auto; }
-  .loop-row {
-    display: flex; justify-content: center; align-items: stretch; gap: 0;
-    margin: 46px auto 0; max-width: 780px; flex-wrap: wrap;
-  }
-  .loop-node {
-    flex: 1 1 150px; padding: 22px 16px;
-    border: 1px solid var(--line); background: rgba(255, 255, 255, 0.02);
-  }
-  .loop-node:first-child { border-radius: 16px 0 0 16px; }
-  .loop-node:last-child { border-radius: 0 16px 16px 0; }
-  .loop-node + .loop-node { border-left: 0; }
-  @media (max-width: 640px) {
-    .loop-node { flex-basis: 100%; border-radius: 0 !important; border-left: 1px solid var(--line) !important; border-top: 0; }
-    .loop-node:first-child { border-radius: 16px 16px 0 0 !important; border-top: 1px solid var(--line); }
-    .loop-node:last-child { border-radius: 0 0 16px 16px !important; }
-  }
-  .loop-node .ic { font-size: 22px; margin-bottom: 10px; }
-  .loop-node h3 { font-size: 15px; font-weight: 750; margin-bottom: 5px; }
-  .loop-node h3 .n { font-family: var(--mono); font-size: 11px; color: var(--faint); margin-right: 6px; }
-  .loop-node p { font-size: 12.5px; color: var(--muted); line-height: 1.55; }
-  .loop-node.hl { border-color: rgba(35, 224, 200, 0.35); background: rgba(35, 224, 200, 0.045); }
-  .loop-hint { margin-top: 18px; font-family: var(--mono); font-size: 12px; color: var(--faint); }
-  .loop-hint b { color: var(--scan); font-weight: 500; }
-
-  /* ---------- footer ---------- */
-  footer { border-top: 1px solid var(--line); padding: 60px 0 46px; text-align: center; }
-  .foot-brand { display: inline-flex; align-items: center; gap: 11px; font-weight: 800; font-size: 19px; }
-  .foot-brand img { width: 34px; height: 34px; border-radius: 8px; }
-  footer .tag { margin-top: 12px; color: var(--muted); font-size: 14px; }
-  footer .soon { margin-top: 22px; }
-  footer .copyright { margin-top: 40px; font-family: var(--mono); font-size: 11.5px; color: var(--faint); }
-
-  .reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s ease; }
-  .reveal.in { opacity: 1; transform: none; }
-  @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
+@media(max-width:640px){
+  body{font-size:18px}
+  .hd{height:64px}
+  .brand{font-size:21px}
+  .hero{padding:52px 0 36px}
+  .hero h1{font-size:33px}
+  article h1{font-size:31px}
+  .body h2{font-size:24px}
+  .t{font-size:23px}
+  .body blockquote{padding:18px 20px;font-size:18px}
+  nav a{margin-left:15px;font-size:14px}
+}
 </style>
 </head>
 <body>
-
-<nav>
-  <div class="wrap nav-inner">
-    <a class="brand" href="#top"><img src="assets/appicon.png" alt="NumTerra 앱 아이콘" /><span>Num<span class="t">Terra</span></span></a>
-    <span class="nav-pill">App Store 출시 준비 중</span>
-  </div>
-</nav>
-
-<header class="hero" id="top">
-  <div class="wrap hero-inner">
-    <div>
-      <span class="kicker"><span class="dot"></span>Road Sensing · Community Verified</span>
-      <h1>내 동네 도로의 위험,<br /><span class="c">내가 먼저</span> 찾는다</h1>
-      <p class="lede">평소처럼 운전만 하세요. 폰의 센서가 도로의 충격을 기록하고, 내 동네 지도 위에 위험 후보가 켜집니다. 이웃의 검증이 더해지면 신호는 사실이 됩니다.</p>
-      <div class="cta-row">
-        <span class="btn-store"><svg class="apple" width="22" height="26" viewBox="0 0 814 1000" fill="currentColor" aria-hidden="true"><path d="M788 341c-6 4-109 62-109 191 0 149 131 202 135 203-1 3-21 72-69 142-43 62-88 123-156 123s-86-40-165-40c-77 0-104 41-167 41s-107-57-157-127C42 792 0 665 0 545c0-193 125-295 249-295 66 0 120 43 161 43 39 0 100-46 174-46 28 0 129 3 204 94zM551 159c31-37 53-88 53-139 0-7-1-14-2-20-50 2-110 34-146 76-29 33-56 84-56 136 0 8 1 16 2 18 3 1 8 2 13 2 45 0 102-30 136-73z"/></svg><span><small>Coming soon on the</small><strong>App Store — 출시 준비 중</strong></span></span>
-      </div>
-      <div class="hero-stats">
-        <div class="hs"><b><i>0</i> 원</b><span>추가 장비 없이, 폰 하나로</span></div>
-        <div class="hs"><b>수직 g · 자이로</b><span>주행 중 실시간 기록</span></div>
-        <div class="hs"><b>동네 단위</b><span>내 생활권 도로 지도</span></div>
-      </div>
-    </div>
-    <div class="phone glow-under reveal">
-      <div class="screen">
-        <video autoplay muted loop playsinline preload="metadata" poster="assets/poster-map.jpg">
-          <source src="assets/vid-map.mp4" type="video/mp4" />
-        </video>
-      </div>
-    </div>
-  </div>
-</header>
-
-<section class="story">
-  <div class="wrap story-grid">
-    <div class="txt">
-      <span class="step-label" style="color:var(--scan)">01 · Drive &amp; Record</span>
-      <h2>달리기만 하면,<br />도로가 기록됩니다</h2>
-      <p class="body">주행이 끝나면 내가 지나온 길이 지도 위에 켜지고, 그날 만난 충격들이 함께 표시됩니다. 도시를 조금씩 밝혀가는 감각 — 그것이 NumTerra의 첫 경험입니다.</p>
-      <div class="chips">
-        <span class="chip">speed <b>· 실시간</b></span>
-        <span class="chip">수직 충격 <b>g</b></span>
-        <span class="chip">gyro <b>rad/s</b></span>
-      </div>
-    </div>
-    <div class="media phone small glow-under reveal">
-      <div class="screen">
-        <video autoplay muted loop playsinline preload="metadata" poster="assets/poster-reveal.jpg">
-          <source src="assets/vid-reveal.mp4" type="video/mp4" />
-        </video>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="story">
-  <div class="wrap story-grid flip">
-    <div class="txt">
-      <span class="step-label" style="color:var(--amber)">02 · Physics, not vibes</span>
-      <h2>위험의 기준은<br />감이 아니라 물리식</h2>
-      <p class="body">무엇을 '위험'으로 볼지는 수식이 정합니다. 속도로 보정한 충격 크기, 파형의 모양, 주행의 안정성 — 물리량으로 판단하고, 수식은 누구나 열어 보고 바꿀 수 있습니다.</p>
-      <div class="formula-card">
-        <div class="fh"><b>기본 (균형)</b><span>DETECTOR FORMULA</span></div>
-        <code>normPeak <span class="op">&gt;=</span> 0.45 <span class="op">&amp;&amp;</span> steadiness <span class="op">&gt;=</span> 0.4</code>
-        <p class="fn">속도 보정 충격이 임계 이상이고, 등속 주행이라 신호가 깨끗할 때만 위험 후보로 판정합니다.</p>
-      </div>
-    </div>
-    <div class="media phone small glow-under reveal">
-      <div class="screen"><img src="assets/scr-detector.png" alt="NumTerra 탐지기 화면 — 물리식 프리셋 목록" loading="lazy" /></div>
-    </div>
-  </div>
-</section>
-
-<section class="story">
-  <div class="wrap story-grid">
-    <div class="txt">
-      <span class="step-label" style="color:var(--orange)">03 · Verified like a wiki</span>
-      <h2>이웃의 투표로,<br />신호가 사실이 됩니다</h2>
-      <p class="body">모든 지점에는 위키처럼 문서가 생깁니다. 충격 파형이 공개되고, 이 길을 지나는 이웃들이 "실제 위험인가요?"에 투표하고 메모를 남깁니다. 센서의 추측이 동네의 합의로 단단해지는 과정입니다.</p>
-      <span class="verdict"><span class="badge">✓</span>확인됨 · 4명 참여 · 과속방지턱</span>
-    </div>
-    <div class="media phone small glow-under reveal">
-      <div class="screen"><img src="assets/scr-spot.png" alt="NumTerra 스팟 위키 화면 — 커뮤니티 검증 투표" loading="lazy" /></div>
-    </div>
-  </div>
-</section>
-
-<section class="story">
-  <div class="wrap story-grid flip">
-    <div class="txt">
-      <span class="step-label" style="color:var(--scan)">04 · My neighborhood report</span>
-      <h2>내 동네 리포트를<br />AI와 함께 씁니다</h2>
-      <p class="body">이번 주 내 기록을 바탕으로 AI가 동네 도로 리포트를 정리해 줍니다. 어디를 먼저 살펴야 하는지, 지난주보다 나아졌는지, 어디부터 신고하면 좋은지 — 대화로 물어볼 수 있습니다. 좌표와 경로는 기기에만 남고, 동네 이름과 건수만 전송됩니다.</p>
-      <div class="chips">
-        <span class="chip">제일 살펴야 할 곳은?</span>
-        <span class="chip">지난번보다 나아졌어?</span>
-        <span class="chip">어디부터 신고하면 좋을까?</span>
-      </div>
-    </div>
-    <div class="media phone small glow-under reveal">
-      <div class="screen"><img src="assets/scr-report.png" alt="NumTerra 내 동네 리포트 화면 — AI 도로 리포트 대화" loading="lazy" /></div>
-    </div>
-  </div>
-</section>
-
-<section class="future">
-  <div class="wrap">
-    <span class="step-label reveal" style="color:var(--red)">Next · Physical AI</span>
-    <h2 class="reveal">검증된 도로가,<br />모델을 가르칩니다</h2>
-    <p class="sub reveal">이웃이 검증한 지점은 그대로 학습 데이터가 됩니다. 도로·차량의 물리를 아는 모델이 이 데이터로 학습을 거듭하면, 사람 눈에 보이지 않는 미세한 전조 — 싱크홀 같은 위험까지 조기에 찾아내는 것이 NumTerra의 다음 단계입니다.</p>
-    <div class="loop-row reveal">
-      <div class="loop-node"><div class="ic">📡</div><h3><span class="n">1</span>주행 기록</h3><p>일상 주행이 도로 신호를 쌓습니다</p></div>
-      <div class="loop-node"><div class="ic">🗳️</div><h3><span class="n">2</span>동네 검증</h3><p>위키처럼 투표로 사실이 확정됩니다</p></div>
-      <div class="loop-node hl"><div class="ic">🧠</div><h3><span class="n">3</span>Physical AI 학습</h3><p>검증 데이터로 물리 모델이 학습합니다</p></div>
-      <div class="loop-node"><div class="ic">🚨</div><h3><span class="n">4</span>조기 경보</h3><p>더 미세한 전조를 더 일찍 찾아냅니다</p></div>
-    </div>
-    <p class="loop-hint reveal">데이터가 쌓일수록 <b>탐지는 정교해지고</b>, 도시는 더 일찍 알게 됩니다.</p>
-  </div>
-</section>
-
-<footer>
-  <div class="wrap">
-    <div class="foot-brand"><img src="assets/appicon.png" alt="" /><span>Num<span style="color:var(--scan)">Terra</span></span></div>
-    <p class="tag">주행이 기록이 되고, 이웃의 검증으로 사실이 되는 동네 도로 안전 지도.</p>
-    <div class="soon"><span class="nav-pill">App Store 출시 준비 중</span></div>
-    <p class="copyright">© 2026 NumTerra. All rights reserved.</p>
-  </div>
-</footer>
-
-<script>
-  const io = new IntersectionObserver((entries) => {
-    for (const e of entries) if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
-  }, { threshold: 0.15 });
-  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
-</script>
-
-</body>
-</html>
+<header><div class="wrap hd">
+  <a class="brand" href="/">NumTerra</a>
+  <nav><a href="/">연재</a><a href="/about/">소개</a></nav>
+</div></header>
+<div class="wrap"><section class="hero"><div class="kicker">연재</div><h1>우리 동네가 먼저 안다</h1><p>싱크홀은 갑자기 생기지 않는다. 갑자기 드러날 뿐이다. 매일 그 길을 지나는 사람들과, 그들의 주머니 속 센서가 먼저 알아채는 방법에 관한 연재.</p></section></div><div class="rule"></div><div class="wrap"><section class="list"><a class="item" href="/blog/01-it-was-fine-yesterday/"><div class="no">제1회</div><div class="t">그 도로는 어제도 멀쩡했다</div><p class="ex">갑자기 생긴 구멍 싱크홀 사고 소식에는 대체로 비슷한 반응이 따라붙는다. 늘 다니던 길이었다는 것. 어제도 그 길로 출근했고, 아무 이상이 없었다. 그리고 오늘 아침, 도로 한가운데가 내려앉았다. 그래서 싱…</p><div class="meta">2026-07-24 · 읽는 데 8분</div></a><a class="item" href="/blog/02-old-tech-new-problem/"><div class="no">제2회</div><div class="t">도로를 재는 기술은 이미 오래됐다, 그런데 왜</div><p class="ex">우리는 도로를 잴 줄 안다 싱크홀 이야기를 하면 대개 이런 반응이 돌아온다. "기술이 아직 부족한 거 아니야?" 그런데 도로를 측정하는 기술은 부족하지 않다. 오히려 오래됐고, 종류도 많다. 무엇을 재느냐에…</p><div class="meta">2026-07-25 · 읽는 데 9분</div></a><a class="item" href="/blog/03-pothole-vs-sinkhole/"><div class="no">제3회</div><div class="t">포트홀과 싱크홀은 다른 문제다</div><p class="ex">비슷해 보이는 두 구멍 둘 다 도로에 생긴 구멍이다. 둘 다 차를 위협한다. 둘 다 "도로가 파였다"는 말로 신고된다. 그래서 자주 한 묶음으로 이야기된다. 도로 안전 기술을 소개하는 자리에서 포트홀 탐지 …</p><div class="meta">2026-07-26 · 읽는 데 8분</div></a><a class="item" href="/blog/04-beneath-the-surface/"><div class="no">제4회</div><div class="t">표면이 아니라 아래에서 일어나는 일</div><p class="ex">도로는 한 겹이 아니다 도로를 위에서 보면 검은 아스팔트 한 장처럼 보인다. 실제로는 여러 층이 겹쳐 있다. 가장 위가 우리가 밟는 표층이다. 그 아래에 하중을 분산시키는 중간층이 있고, 그 밑에 자갈이나 …</p><div class="meta">2026-07-27 · 읽는 데 8분</div></a></section></div><footer><div class="wrap">© NumTerra</div></footer>
+</body></html>

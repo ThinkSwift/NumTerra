@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>포트홀과 싱크홀은 다른 문제다 — NumTerra</title>
+<meta name="description" content="비슷해 보이는 두 구멍 둘 다 도로에 생긴 구멍이다. 둘 다 차를 위협한다. 둘 다 "도로가 파였다"는 말로 신고된다. 그래서 자주 한 묶음으로 이야기된다. 도로 안전 기술을 소개하는 자리에서 포트홀 탐지 …">
+<meta property="og:title" content="포트홀과 싱크홀은 다른 문제다 — NumTerra">
+<meta property="og:description" content="비슷해 보이는 두 구멍 둘 다 도로에 생긴 구멍이다. 둘 다 차를 위협한다. 둘 다 "도로가 파였다"는 말로 신고된다. 그래서 자주 한 묶음으로 이야기된다. 도로 안전 기술을 소개하는 자리에서 포트홀 탐지 …">
+<meta property="og:type" content="article">
+<meta name="theme-color" content="#fbfaf7">
+<link rel="icon" href="/assets/logo.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap">
+<style>
+:root{
+  --bg:#fbfaf7; --paper:#fff; --line:#e6e1d8; --line2:#d8d2c6;
+  --fg:#1c1b19; --dim:#6b665e; --faint:#98928a;
+  --accent:#b4451f; --accent-soft:#f4ece7;
+  --serif:"Nanum Myeongjo",'Apple SD Gothic Neo',Georgia,serif;
+  --sans:Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);
+  font-size:19px;line-height:1.9;letter-spacing:-.004em;-webkit-font-smoothing:antialiased}
+a{color:var(--fg);text-decoration:none}
+.wrap{max-width:700px;margin:0 auto;padding:0 26px}
+
+/* header */
+header{border-bottom:1px solid var(--line);background:var(--bg)}
+.hd{display:flex;align-items:baseline;justify-content:space-between;height:76px}
+.brand{font-family:var(--serif);font-size:24px;font-weight:700;letter-spacing:-.02em}
+nav a{font-size:15px;color:var(--dim);margin-left:24px}
+nav a:hover{color:var(--accent)}
+
+/* index hero */
+.hero{padding:80px 0 52px}
+.kicker{font-size:13px;letter-spacing:.14em;color:var(--accent);text-transform:uppercase;
+  font-weight:600;margin-bottom:22px}
+.hero h1{font-family:var(--serif);font-size:46px;line-height:1.28;margin:0 0 22px;
+  letter-spacing:-.03em;font-weight:700}
+.hero p{color:var(--dim);font-size:18px;line-height:1.8;margin:0;max-width:40em}
+.rule{height:1px;background:var(--line2);margin:0}
+
+/* post list */
+.list{padding:0 0 90px}
+.item{display:block;padding:38px 0;border-bottom:1px solid var(--line)}
+.item:hover .t{color:var(--accent)}
+.no{font-size:12.5px;letter-spacing:.14em;color:var(--accent);font-weight:600}
+.t{font-family:var(--serif);font-size:27px;font-weight:700;margin:10px 0 12px;
+  letter-spacing:-.022em;line-height:1.35;transition:color .15s}
+.ex{color:var(--dim);font-size:17px;line-height:1.8;margin:0}
+.meta{font-size:13.5px;color:var(--faint);margin-top:14px}
+
+/* article */
+article{padding:64px 0 40px}
+.a-kicker{font-size:13px;letter-spacing:.14em;color:var(--accent);text-transform:uppercase;
+  font-weight:600;margin-bottom:18px}
+article h1{font-family:var(--serif);font-size:42px;line-height:1.26;margin:0 0 20px;
+  letter-spacing:-.03em;font-weight:700}
+.a-meta{font-size:14px;color:var(--faint);padding-bottom:32px;
+  border-bottom:1px solid var(--line2);margin-bottom:40px}
+.body h2{font-family:var(--serif);font-size:28px;margin:58px 0 18px;
+  letter-spacing:-.022em;font-weight:700;line-height:1.4}
+.body h3{font-size:20px;margin:38px 0 12px;font-weight:650}
+.body p{margin:0 0 24px}
+.body strong{font-weight:700}
+.body em{font-style:italic;color:var(--dim)}
+.body ul,.body ol{padding-left:24px;margin:0 0 24px}
+.body li{margin-bottom:9px}
+.body blockquote{margin:32px 0;padding:22px 26px;background:var(--accent-soft);
+  border-radius:3px;font-family:var(--serif);font-size:20px;line-height:1.75;color:#4a3b33}
+.body blockquote p{margin:0 0 12px}
+.body blockquote p:last-child{margin:0}
+.body blockquote blockquote{background:none;padding:0 0 0 18px;
+  border-left:3px solid var(--accent);margin:12px 0;font-size:19px}
+.body code{font-family:ui-monospace,Menlo,monospace;font-size:.86em;
+  background:#f0ece5;border-radius:3px;padding:2px 6px}
+.body pre{background:#f5f2ec;border:1px solid var(--line);border-radius:6px;
+  padding:18px;overflow-x:auto;margin:28px 0}
+.body pre code{background:none;padding:0;font-size:14.5px;line-height:1.7}
+.body hr{border:0;border-top:1px solid var(--line2);margin:48px 0}
+.body img{max-width:100%;height:auto;margin:30px 0;border-radius:3px}
+.body figcaption,.body img+em{display:block;font-size:14.5px;color:var(--faint);
+  text-align:center;margin-top:-18px}
+.body table{width:100%;border-collapse:collapse;margin:28px 0;font-size:16.5px;
+  display:block;overflow-x:auto}
+.body th,.body td{border-bottom:1px solid var(--line);padding:11px 12px;text-align:left}
+.body th{border-bottom:2px solid var(--line2);font-weight:700}
+
+/* footer nav */
+.pnav{display:flex;justify-content:space-between;gap:18px;
+  border-top:1px solid var(--line2);padding:32px 0 0;margin-top:52px}
+.pnav a{font-family:var(--serif);font-size:18px;max-width:46%;line-height:1.45}
+.pnav a:hover{color:var(--accent)}
+.pnav .lbl{display:block;font-family:var(--sans);font-size:12px;color:var(--faint);
+  letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;font-weight:600}
+footer{border-top:1px solid var(--line);margin-top:72px;padding:32px 0 56px;
+  color:var(--faint);font-size:14px}
+
+@media(max-width:640px){
+  body{font-size:18px}
+  .hd{height:64px}
+  .brand{font-size:21px}
+  .hero{padding:52px 0 36px}
+  .hero h1{font-size:33px}
+  article h1{font-size:31px}
+  .body h2{font-size:24px}
+  .t{font-size:23px}
+  .body blockquote{padding:18px 20px;font-size:18px}
+  nav a{margin-left:15px;font-size:14px}
+}
+</style>
+</head>
+<body>
+<header><div class="wrap hd">
+  <a class="brand" href="/">NumTerra</a>
+  <nav><a href="/">연재</a><a href="/about/">소개</a></nav>
+</div></header>
+<div class="wrap"><article><div class="a-kicker">우리 동네가 먼저 안다 · 제3회</div><h1>포트홀과 싱크홀은 다른 문제다</h1><div class="a-meta">2026-07-26 · 읽는 데 8분</div><div class="body"><h2>비슷해 보이는 두 구멍</h2>
+<p>둘 다 도로에 생긴 구멍이다. 둘 다 차를 위협한다. 둘 다 &ldquo;도로가 파였다&rdquo;는 말로 신고된다.</p>
+<p>그래서 자주 한 묶음으로 이야기된다. 도로 안전 기술을 소개하는 자리에서 포트홀 탐지 사례를 들고 나와 싱크홀 대응까지 함께 언급하는 경우가 흔하다.</p>
+<p>그런데 이 둘은 <strong>생기는 곳도, 생기는 방식도, 잡아내야 할 시점도 다르다.</strong> 같은 기술로 접근하면 한쪽은 잘 풀리고 다른 한쪽은 계속 놓친다.</p>
+<h2>포트홀: 위에서 아래로</h2>
+<p>포트홀은 표면에서 시작한다.</p>
+<p>아스팔트 포장에 미세한 균열이 생긴다. 비가 오면 그 틈으로 물이 들어간다. 겨울에 물이 얼면 부피가 늘면서 균열을 넓힌다. 녹으면 다시 스며든다. 이 과정이 반복되며 포장이 잘게 부서지고, 그 위로 차가 지나가면서 부서진 조각이 튀어 나간다.</p>
+<p>그렇게 구멍이 된다.</p>
+<p>중요한 것은 <strong>모든 단계가 표면에서 보인다</strong>는 점이다. 처음엔 실금이고, 다음엔 거미줄 모양 균열이고, 그다음엔 조각이 들뜬다. 사진을 찍으면 찍히고, 차가 지나가면 덜컹거린다.</p>
+<p>그래서 포트홀 탐지는 기술적으로 잘 풀린 문제에 속한다. 카메라 영상에서 패턴을 인식하거나, 주행 중 진동의 급격한 변화를 잡으면 된다. <strong>찾아야 할 것이 겉으로 드러나 있다.</strong></p>
+<h2>싱크홀: 아래에서 위로</h2>
+<p>싱크홀은 반대 방향이다.</p>
+<p>시작점은 땅속이다. 상하수도관의 균열, 지하 공사, 지하수 흐름의 변화 같은 원인으로 흙이 조금씩 쓸려 나간다. 빈 공간이 생기고, 시간이 지나며 커진다.</p>
+<p>이 기간 동안 위쪽 포장은 <strong>아무 이상이 없다.</strong> 아스팔트와 그 아래 다짐층은 어느 정도 스스로 하중을 버티는 구조라, 바로 밑이 비어도 한동안은 멀쩡히 서 있다.</p>
+<p>그러다 빈 공간이 어느 크기를 넘으면 더는 버티지 못하고 한꺼번에 내려앉는다.</p>
+<p><strong>포트홀은 서서히 나빠지는 것이 보인다. 싱크홀은 서서히 나빠지는 것이 안 보인다.</strong></p>
+<p>이 차이가 모든 것을 가른다.</p>
+<h2>잡아야 할 시점이 다르다</h2>
+<p>두 문제는 대응해야 할 시점도 다르다.</p>
+<p>포트홀은 <strong>생긴 다음에 잡아도 된다.</strong> 이미 생긴 구멍을 빨리 찾아 빨리 메우면 목적이 달성된다. 위험하긴 해도 대체로 차량 손상 수준이고, 발견에서 보수까지 며칠이 걸려도 큰일이 나지는 않는다.</p>
+<p>싱크홀은 <strong>생기고 나면 늦다.</strong> 붕괴가 곧 사고다. 발견했을 때는 이미 사람이 빠진 뒤일 수 있다.</p>
+<p>그러니까 포트홀은 <em>탐지</em>의 문제이고, 싱크홀은 <em>예측</em>의 문제다.</p>
+<p>탐지는 있는 것을 찾는 일이다. 예측은 아직 없는 것의 징후를 찾는 일이다. 난이도가 근본적으로 다르다.</p>
+<h2>그런데 왜 자꾸 섞이나</h2>
+<p>두 문제가 섞이는 이유는 단순하다. <strong>포트홀 쪽이 훨씬 풀기 쉽고, 성과가 눈에 보이기 때문</strong>이다.</p>
+<p>포트홀 탐지 시스템을 만들면 곧바로 숫자가 나온다. 몇 건을 찾았고, 정확도가 몇 퍼센트고, 보수까지 며칠이 단축되었는지. 검증도 쉽다. 찾았다는 곳에 가보면 구멍이 있거나 없다.</p>
+<p>싱크홀 예측은 그렇지 않다. &ldquo;여기가 위험합니다&rdquo;라고 지목해도, 실제로 무너지기 전까지는 맞았는지 알 수 없다. 그리고 대개는 무너지지 않는다. 싱크홀은 드문 사건이기 때문이다.</p>
+<p>그래서 성과를 보여주기 좋은 쪽으로 자연스럽게 무게가 실린다. 포트홀 기술이 발전하고, 그 성과가 도로 안전 전반의 진전으로 이야기된다. 하지만 <strong>정작 사람이 죽는 쪽 문제는 그대로 남아 있다.</strong></p>
+<h2>우리가 서 있는 자리</h2>
+<p>그렇다고 포트홀 기술이 쓸모없다는 뜻은 아니다. 오히려 우리는 그 위에서 출발한다.</p>
+<p>주행 중 &ldquo;쿵&rdquo; 하는 충격을 감지하는 기술은 이미 있다. 우리도 그것부터 시작한다. 다만 그것을 <strong>최종 목표가 아니라 입구로 본다.</strong></p>
+<ul>
+<li><strong>1단계</strong> — 사람이 느낀 충격을 기록한다. 이건 포트홀 탐지와 같은 층위의 일이고, 지금 당장 할 수 있다.</li>
+<li><strong>2단계</strong> — 그렇게 모인 데이터에서, 충격만이 아니라 노면 응답의 미세한 변화를 읽어낸다. 이게 싱크홀 쪽으로 가는 길이다.</li>
+</ul>
+<p>1단계가 먼저인 이유는 두 가지다. 하나는 <strong>지금 바로 쓸모가 있어야 사람들이 쓴다</strong>는 것. 아무도 안 쓰는 앱에는 데이터가 쌓이지 않는다. 다른 하나는 <strong>2단계에 필요한 정답지를 1단계가 만들어준다</strong>는 것이다.</p>
+<p>사람이 &ldquo;여기 이상하다&rdquo;고 표시한 지점과 그때의 신호. 이 짝이 쌓여야 기계가 배울 수 있다.</p>
+<p>그러니 포트홀과 싱크홀을 구분하는 것은 두 문제를 갈라놓기 위해서가 아니다. <strong>어느 쪽이 사다리의 첫 칸이고 어느 쪽이 도착점인지 분명히 하기 위해서다.</strong></p>
+<hr />
+<p><strong>다음 편 예고 —</strong> <em>표면이 아니라 아래에서 일어나는 일.</em> 포장 밑에서 무슨 일이 벌어지는지, 왜 그것이 위에서는 보이지 않는지 들여다본다.</p></div><div class="pnav"><a href="/blog/02-old-tech-new-problem/"><span class="lbl">이전 회</span>도로를 재는 기술은 이미 오래됐다, 그런데 왜</a><a href="/blog/04-beneath-the-surface/" style="text-align:right"><span class="lbl">다음 회</span>표면이 아니라 아래에서 일어나는 일</a></div></article></div><footer><div class="wrap">© NumTerra</div></footer>
+</body></html>

@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NumTerra 해부 — 앱과 데이터 파이프라인 — NumTerra</title>
+<meta name="description" content="되는 것과 되게 하려는 것 이 편에서는 실제 구조를 정리한다. 그리고 22편에서 정한 원칙에 따라 현재 동작하는 것과 계획을 구분해서 적는다. 이 구분이 흐려지면 나중에 스스로도 무엇을 달성했는지 모르게 된…">
+<meta property="og:title" content="NumTerra 해부 — 앱과 데이터 파이프라인 — NumTerra">
+<meta property="og:description" content="되는 것과 되게 하려는 것 이 편에서는 실제 구조를 정리한다. 그리고 22편에서 정한 원칙에 따라 현재 동작하는 것과 계획을 구분해서 적는다. 이 구분이 흐려지면 나중에 스스로도 무엇을 달성했는지 모르게 된…">
+<meta property="og:type" content="article">
+<meta name="theme-color" content="#fbfaf7">
+<link rel="icon" href="/assets/logo.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap">
+<style>
+:root{
+  --bg:#fbfaf7; --paper:#fff; --line:#e6e1d8; --line2:#d8d2c6;
+  --fg:#1c1b19; --dim:#6b665e; --faint:#98928a;
+  --accent:#b4451f; --accent-soft:#f4ece7; --accent-pale:#dcb6a3;
+  --serif:"Nanum Myeongjo",'Apple SD Gothic Neo',Georgia,serif;
+  --sans:Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);
+  font-size:19px;line-height:1.9;letter-spacing:-.004em;-webkit-font-smoothing:antialiased}
+a{color:var(--fg);text-decoration:none}
+.wrap{max-width:700px;margin:0 auto;padding:0 26px}
+
+/* header */
+header{border-bottom:1px solid var(--line);background:var(--bg)}
+.hd{display:flex;align-items:baseline;justify-content:space-between;height:76px}
+.brand{font-family:var(--serif);font-size:24px;font-weight:700;letter-spacing:-.02em}
+nav.top a{font-size:15px;color:var(--dim);margin-left:24px}
+nav.top a:hover{color:var(--accent)}
+
+/* index hero */
+.hero{padding:80px 0 52px}
+.kicker{font-size:13px;letter-spacing:.14em;color:var(--accent);text-transform:uppercase;
+  font-weight:600;margin-bottom:22px}
+.hero h1{font-family:var(--serif);font-size:46px;line-height:1.28;margin:0 0 22px;
+  letter-spacing:-.03em;font-weight:700}
+.hero p{color:var(--dim);font-size:18px;line-height:1.8;margin:0;max-width:40em}
+.rule{height:1px;background:var(--line2);margin:0}
+
+/* ───────── 핵심 요약 ───────── */
+.brief{padding:54px 0 8px}
+.brief-lbl{font-size:12px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--accent);font-weight:700}
+.brief-lbl::after{content:"";display:block;width:42px;height:2px;
+  background:var(--accent);margin-top:12px}
+.lede{font-family:var(--serif);font-size:23px;line-height:1.74;margin:26px 0 0;
+  letter-spacing:-.025em;font-weight:700}
+.lede2{font-size:17.5px;line-height:1.82;margin:16px 0 0;color:var(--dim)}
+.bsec{font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;
+  color:var(--faint);margin:52px 0 0;padding-bottom:9px;border-bottom:1px solid var(--line2)}
+.bsec b{color:var(--accent);font-family:var(--serif);margin-right:9px}
+.btxt{font-size:16.5px;line-height:1.82;color:var(--dim);margin:20px 0 0}
+.btxt strong{color:var(--fg);font-weight:700}
+
+/* 세 개의 벽 */
+.walls{margin:22px 0 0;padding:0;list-style:none}
+.wall{display:flex;gap:16px;padding:14px 0;border-bottom:1px dotted var(--line2)}
+.wall:last-child{border-bottom:0;padding-bottom:0}
+.wall-k{flex:0 0 3.4em;font-family:var(--serif);font-size:19px;font-weight:700;
+  color:var(--accent);line-height:1.6}
+.wall-v{flex:1 1 auto;min-width:0;font-size:16px;line-height:1.78;color:var(--dim)}
+
+/* 포트홀 vs 싱크홀 */
+.cmp{width:100%;border-collapse:collapse;margin:22px 0 0;font-size:16px}
+.cmp th,.cmp td{padding:12px 10px;text-align:left;vertical-align:top;
+  border-bottom:1px solid var(--line);line-height:1.65}
+.cmp thead th{font-family:var(--serif);font-size:17px;font-weight:700;
+  border-bottom:1px solid var(--line2)}
+.cmp thead th.sink{color:var(--accent)}
+.cmp thead th:first-child{font-family:var(--sans);font-size:11.5px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--faint);font-weight:700}
+.cmp tbody th{font-weight:600;font-size:13.5px;color:var(--faint);width:6.4em;
+  letter-spacing:.02em}
+.cmp td{color:var(--dim)}
+.cmp td.key{font-family:var(--serif);font-size:18px;font-weight:700;color:var(--fg)}
+.cmp td.key.sink{color:var(--accent)}
+.cmp tbody tr:last-child th,.cmp tbody tr:last-child td{border-bottom:0}
+
+/* 방향 전환 */
+.flip{display:flex;gap:13px;margin:24px 0 0}
+.fx{flex:1 1 0;min-width:0;padding:17px 19px;border:1px solid var(--line2);
+  border-radius:3px;background:var(--paper)}
+.fx.new{border-color:var(--accent);background:var(--accent-soft)}
+.fx-k{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;
+  color:var(--faint);margin-bottom:9px}
+.fx.new .fx-k{color:var(--accent)}
+.fx-t{font-family:var(--serif);font-size:18.5px;font-weight:700;line-height:1.52;
+  letter-spacing:-.02em}
+.fx.old .fx-t{color:var(--faint)}
+.fx-arrow{flex:0 0 auto;align-self:center;color:var(--accent);font-size:19px;line-height:1}
+
+/* 텍스트 + 스크린샷 */
+.split{display:flex;gap:26px;align-items:flex-start;margin:20px 0 0}
+.split-t{flex:1 1 auto;min-width:0}
+.split-t p{margin:0 0 14px;font-size:16.5px;line-height:1.82;color:var(--dim)}
+.split-t p:last-child{margin:0}
+.split-t strong{color:var(--fg);font-weight:700}
+.shot{flex:0 0 172px;margin:0}
+.shot img{display:block;width:100%;height:auto;border:1px solid var(--line2);
+  border-radius:9px;background:#0d0f13}
+.shot figcaption{font-size:12.5px;line-height:1.6;color:var(--faint);margin-top:9px}
+
+/* 1단계 → 2단계 */
+.stage{margin:26px 0 0;padding:24px 0 0;border-top:1px solid var(--line)}
+.stage-hd{display:flex;align-items:center;gap:11px;flex-wrap:wrap}
+.stage-n{font-size:11.5px;font-weight:700;letter-spacing:.1em;color:#fff;
+  background:var(--accent);border-radius:2px;padding:4px 9px}
+.stage-who{font-size:12.5px;letter-spacing:.1em;color:var(--faint);font-weight:700;
+  text-transform:uppercase}
+.stage-t{font-family:var(--serif);font-size:25px;font-weight:700;letter-spacing:-.028em;
+  margin:13px 0 0;line-height:1.42}
+.bridge{margin:26px 0 0;padding:15px 19px;background:var(--paper);
+  border-left:3px solid var(--accent);font-size:16px;line-height:1.78;color:var(--dim)}
+.bridge b{color:var(--fg)}
+.bridge .ar{color:var(--accent);font-weight:700;letter-spacing:.1em;
+  display:block;font-size:12px;margin-bottom:6px}
+.caveat{margin:34px 0 0;padding:15px 0 0;border-top:1px solid var(--line);
+  font-size:14.5px;line-height:1.78;color:var(--faint)}
+
+/* ───────── 목차(메인) ───────── */
+.toc{padding:54px 0 90px}
+.toc-hd{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+  padding-bottom:12px;border-bottom:2px solid var(--fg)}
+.toc-hd h2{font-family:var(--serif);font-size:22px;margin:0;font-weight:700;
+  letter-spacing:-.025em}
+.toc-hd .cnt{font-size:13px;color:var(--faint);margin-left:auto}
+.toc-comb{margin:20px 0 0}
+.toc-comb .comb{gap:9px}
+.toc-comb .tk{height:20px}
+.toc-comb .tk i{height:7px}
+.toc-legend{display:flex;gap:18px;margin:11px 0 0;font-size:11.5px;color:var(--faint);
+  letter-spacing:.02em}
+.toc-legend span{display:flex;align-items:center;gap:7px}
+.toc-legend i{display:block;width:17px;height:5px;border-radius:1px;background:var(--line2)}
+.toc-legend .lg-pub i{background:var(--accent-pale)}
+.part{margin-top:32px}
+.part-hd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
+  padding-bottom:9px;border-bottom:1px solid var(--line2)}
+.part-no{font-family:var(--serif);font-size:14.5px;font-weight:700;color:var(--accent)}
+.part-t{font-family:var(--serif);font-size:20px;font-weight:700;margin:0;
+  letter-spacing:-.025em}
+.part-rg{font-size:12px;color:var(--faint);margin-left:auto;white-space:nowrap}
+.pbadge{font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--accent);
+  background:var(--accent-soft);padding:3px 7px;border-radius:2px}
+.eps{list-style:none;margin:0;padding:0}
+.ep{border-bottom:1px solid var(--line)}
+.ep:last-child{border-bottom:0}
+.ep>a,.ep>span{display:flex;align-items:baseline;gap:14px;padding:13px 2px}
+.ep-no{flex:0 0 2.3em;font-family:var(--serif);font-size:14px;font-weight:700;
+  color:var(--faint)}
+.ep.pub .ep-no{color:var(--accent)}
+.ep-t{flex:1 1 auto;min-width:0;font-family:var(--serif);font-size:18px;
+  line-height:1.5;letter-spacing:-.022em}
+.ep.soon .ep-t{color:#a9a39a}
+.ep-x{flex:0 0 auto;font-size:11.5px;letter-spacing:.04em;color:var(--faint)}
+.ep.pub>a:hover .ep-t{color:var(--accent)}
+.ep.cur>span,.ep.cur>a{background:var(--accent-soft)}
+.ep.cur .ep-t{color:var(--accent);font-weight:700}
+.ep.cur .ep-x{color:var(--accent)}
+
+/* 최신 발행 */
+.latest{padding:52px 0 0}
+.lhd{font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;
+  color:var(--faint);padding-bottom:12px;border-bottom:2px solid var(--fg)}
+.item{display:block;padding:32px 0;border-bottom:1px solid var(--line)}
+.item:hover .t{color:var(--accent)}
+.no{font-size:12.5px;letter-spacing:.1em;color:var(--accent);font-weight:700}
+.no .pt{color:var(--faint);letter-spacing:0;font-weight:600;margin-left:8px}
+.t{font-family:var(--serif);font-size:27px;font-weight:700;margin:9px 0 11px;
+  letter-spacing:-.025em;line-height:1.35;transition:color .15s}
+.ex{color:var(--dim);font-size:16.5px;line-height:1.8;margin:0}
+.meta{font-size:13px;color:var(--faint);margin-top:13px}
+
+/* ───────── 연재 진행 바(글) ───────── */
+.sbar{position:sticky;top:0;z-index:30;background:rgba(251,250,247,.95);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.sbar-in{display:flex;align-items:center;gap:14px;height:40px}
+.sbar-ep{flex:0 0 auto;font-size:12.5px;font-weight:600;color:var(--dim);
+  white-space:nowrap;letter-spacing:-.01em}
+.sbar-ep b{color:var(--accent);font-weight:700}
+.sbar-ep .pt{color:var(--faint);font-weight:500}
+.comb{display:flex;align-items:center;gap:8px;flex:1 1 auto;min-width:0}
+.comb-g{display:flex;align-items:center;gap:2px;min-width:0}
+.tk{display:flex;align-items:center;flex:1 1 0;min-width:0;height:22px}
+.tk i{display:block;width:100%;height:5px;border-radius:1px;background:var(--line2)}
+.tk.pub i{background:var(--accent-pale)}
+.tk.on i{height:13px;background:var(--accent)}
+.tk.on{flex-grow:1.4}
+.prog-track{height:2px;background:var(--line)}
+.prog-track i{display:block;height:2px;width:0;background:var(--accent);
+  transition:width .08s linear}
+
+/* article */
+article{padding:52px 0 40px}
+.a-kicker{font-size:12.5px;letter-spacing:.1em;color:var(--accent);
+  font-weight:700;margin-bottom:16px}
+.a-kicker .sep{color:var(--line2);margin:0 8px}
+.a-kicker .pt{color:var(--faint);font-weight:600}
+article h1{font-family:var(--serif);font-size:42px;line-height:1.26;margin:0 0 20px;
+  letter-spacing:-.03em;font-weight:700}
+.a-meta{font-size:14px;color:var(--faint);padding-bottom:32px;
+  border-bottom:1px solid var(--line2);margin-bottom:40px}
+.body h2{font-family:var(--serif);font-size:28px;margin:58px 0 18px;
+  letter-spacing:-.022em;font-weight:700;line-height:1.4}
+.body h3{font-size:20px;margin:38px 0 12px;font-weight:650}
+.body p{margin:0 0 24px}
+.body strong{font-weight:700}
+.body em{font-style:italic;color:var(--dim)}
+.body ul,.body ol{padding-left:24px;margin:0 0 24px}
+.body li{margin-bottom:9px}
+.body blockquote{margin:32px 0;padding:22px 26px;background:var(--accent-soft);
+  border-radius:3px;font-family:var(--serif);font-size:20px;line-height:1.75;color:#4a3b33}
+.body blockquote p{margin:0 0 12px}
+.body blockquote p:last-child{margin:0}
+.body blockquote blockquote{background:none;padding:0 0 0 18px;
+  border-left:3px solid var(--accent);margin:12px 0;font-size:19px}
+.body code{font-family:ui-monospace,Menlo,monospace;font-size:.86em;
+  background:#f0ece5;border-radius:3px;padding:2px 6px}
+.body pre{background:#f5f2ec;border:1px solid var(--line);border-radius:6px;
+  padding:18px;overflow-x:auto;margin:28px 0}
+.body pre code{background:none;padding:0;font-size:14.5px;line-height:1.7}
+.body hr{border:0;border-top:1px solid var(--line2);margin:48px 0}
+.body img{max-width:100%;height:auto;margin:30px 0;border-radius:3px}
+.body figcaption,.body img+em{display:block;font-size:14.5px;color:var(--faint);
+  text-align:center;margin-top:-18px}
+.body table{width:100%;border-collapse:collapse;margin:28px 0;font-size:16.5px;
+  display:block;overflow-x:auto}
+.body th,.body td{border-bottom:1px solid var(--line);padding:11px 12px;text-align:left}
+.body th{border-bottom:2px solid var(--line2);font-weight:700}
+
+/* 이전/다음 */
+.pnav{display:flex;gap:13px;border-top:1px solid var(--line2);
+  padding-top:28px;margin-top:54px}
+.pn{flex:1 1 0;min-width:0;padding:15px 18px;border:1px solid var(--line);
+  border-radius:3px;background:var(--paper);transition:border-color .15s}
+.pn.next{text-align:right}
+.pn:hover{border-color:var(--accent)}
+.pn:hover .pn-t{color:var(--accent)}
+.pn .lbl{display:block;font-size:11px;color:var(--faint);letter-spacing:.12em;
+  text-transform:uppercase;font-weight:700;margin-bottom:7px}
+.pn-t{display:block;font-family:var(--serif);font-size:17.5px;font-weight:700;
+  line-height:1.5;letter-spacing:-.022em;transition:color .15s}
+.pn-e{display:block;font-size:12px;color:var(--faint);margin-top:5px;font-weight:600}
+
+/* 하단 시리즈 안내 */
+.send{margin-top:44px;padding-top:26px;border-top:1px solid var(--line)}
+.send-hd{font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:700;color:var(--faint)}
+.send-p{font-size:16px;line-height:1.8;color:var(--dim);margin:12px 0 0}
+.send-p b{color:var(--fg)}
+.fold{margin:18px 0 0;border:1px solid var(--line2);border-radius:3px;
+  background:var(--paper)}
+.fold>summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:9px;
+  font-size:14.5px;font-weight:700;color:var(--fg);padding:14px 18px}
+.fold>summary::-webkit-details-marker{display:none}
+.fold>summary::before{content:"+";color:var(--accent);font-weight:700;font-size:17px;
+  line-height:1;width:12px;text-align:center}
+.fold[open]>summary::before{content:"\2013"}
+.fold>summary::after{content:"30편 전체";margin-left:auto;font-size:12px;
+  color:var(--faint);font-weight:600}
+.fold>summary:hover{color:var(--accent)}
+.fold-in{padding:0 18px 20px;border-top:1px solid var(--line)}
+.fold-in .part{margin-top:22px}
+.fold-in .part-t{font-size:18px}
+.fold-in .ep-t{font-size:16.5px}
+.fold-in .ep>a,.fold-in .ep>span{padding:10px 2px}
+
+footer{border-top:1px solid var(--line);margin-top:72px;padding:32px 0 56px;
+  color:var(--faint);font-size:14px}
+footer a{color:var(--dim)}
+
+@media(max-width:640px){
+  body{font-size:18px}
+  .wrap{padding:0 20px}
+  .hd{height:64px}
+  .brand{font-size:21px}
+  nav.top a{margin-left:15px;font-size:14px}
+  .hero{padding:48px 0 34px}
+  .hero h1{font-size:33px}
+  .hero p{font-size:17px}
+  article h1{font-size:31px}
+  .body h2{font-size:24px}
+  .body blockquote{padding:18px 20px;font-size:18px}
+  .t{font-size:23px}
+  /* 요약 */
+  .brief{padding:44px 0 8px}
+  .lede{font-size:20.5px}
+  .lede2{font-size:16.5px}
+  .btxt,.split-t p{font-size:16px}
+  .wall-k{flex-basis:2.7em;font-size:17.5px}
+  .wall-v{font-size:15.5px}
+  .cmp{font-size:15px}
+  .cmp th,.cmp td{padding:11px 7px}
+  .cmp tbody th{width:5.2em;font-size:12.5px}
+  .cmp td.key{font-size:16.5px}
+  .flip{flex-direction:column;gap:9px}
+  .fx-arrow{transform:rotate(90deg);align-self:center;margin:1px 0}
+  .split{flex-direction:column;gap:16px}
+  .shot{flex:none;width:100%;max-width:214px;margin:2px auto 0}
+  .shot figcaption{text-align:center}
+  .stage-t{font-size:22px}
+  /* 목차 */
+  .toc{padding:44px 0 70px}
+  .toc-hd h2{font-size:19.5px}
+  .toc-hd .cnt{margin-left:0;width:100%}
+  .part-t{font-size:18px}
+  .part-rg{margin-left:0}
+  .ep>a,.ep>span{gap:9px}
+  .ep-no{flex-basis:1.9em;font-size:13px}
+  .ep-t{font-size:16px}
+  .ep-x{font-size:11px;white-space:nowrap}
+  .ep-x .pfx{display:none}
+  .cmp tbody th{width:auto;white-space:nowrap;padding-right:9px}
+  .fold-in .ep-t{font-size:16px}
+  /* 진행 바 */
+  .sbar-in{height:36px;gap:10px}
+  .sbar-ep{font-size:11.5px}
+  .sbar-ep .pt{display:none}
+  .comb{gap:5px}
+  .comb-g{gap:1px}
+  .tk i{height:4px}
+  .tk.on i{height:12px}
+  article{padding:38px 0 30px}
+  .pnav{flex-direction:column;gap:10px}
+  .pn.next{text-align:left}
+  .pn-t{font-size:16.5px}
+  .fold>summary{padding:13px 15px;font-size:14px}
+  .fold-in{padding:0 15px 16px}
+}
+</style>
+</head>
+<body>
+<header><div class="wrap hd">
+  <a class="brand" href="/">NumTerra</a>
+  <nav class="top"><a href="/">연재</a><a href="/#toc">목차</a><a href="/about/">소개</a></nav>
+</div></header>
+<div class="sbar"><div class="wrap sbar-in"><span class="sbar-ep"><b>제29회</b> / 30편 <span class="pt">5부 도시로</span></span><div class="comb" role="navigation" aria-label="연재 진행"><div class="comb-g" style="flex:6 1 0%"><a class="tk pub" href="/blog/01-it-was-fine-yesterday/" title="1부 제1회 그 도로는 어제도 멀쩡했다" aria-label="1부 제1회 그 도로는 어제도 멀쩡했다"><i></i></a><a class="tk pub" href="/blog/02-old-tech-new-problem/" title="1부 제2회 도로를 재는 기술은 이미 오래됐다, 그런데 왜" aria-label="1부 제2회 도로를 재는 기술은 이미 오래됐다, 그런데 왜"><i></i></a><a class="tk pub" href="/blog/03-pothole-vs-sinkhole/" title="1부 제3회 포트홀과 싱크홀은 다른 문제다" aria-label="1부 제3회 포트홀과 싱크홀은 다른 문제다"><i></i></a><a class="tk pub" href="/blog/04-beneath-the-surface/" title="1부 제4회 표면이 아니라 아래에서 일어나는 일" aria-label="1부 제4회 표면이 아니라 아래에서 일어나는 일"><i></i></a><a class="tk pub" href="/blog/05-how-cavities-grow/" title="1부 제5회 공동은 어떻게 자라는가" aria-label="1부 제5회 공동은 어떻게 자라는가"><i></i></a><a class="tk pub" href="/blog/06-three-walls/" title="1부 제6회 비용·주기·깊이 — 기존 방식의 삼중 한계" aria-label="1부 제6회 비용·주기·깊이 — 기존 방식의 삼중 한계"><i></i></a></div><div class="comb-g" style="flex:7 1 0%"><a class="tk pub" href="/blog/07-the-daily-commuter/" title="2부 제7회 매일 그 길을 지나는 사람" aria-label="2부 제7회 매일 그 길을 지나는 사람"><i></i></a><a class="tk pub" href="/blog/08-the-thud/" title="2부 제8회 &quot;쿵&quot; 하는 그 순간, 무슨 일이 일어났나" aria-label="2부 제8회 &quot;쿵&quot; 하는 그 순간, 무슨 일이 일어났나"><i></i></a><a class="tk pub" href="/blog/09-report-button/" title="2부 제9회 느낌을 데이터로 바꾸기 — 신고 버튼의 설계" aria-label="2부 제9회 느낌을 데이터로 바꾸기 — 신고 버튼의 설계"><i></i></a><a class="tk pub" href="/blog/10-planting-flags/" title="2부 제10회 동네에 깃발을 꽂다" aria-label="2부 제10회 동네에 깃발을 꽂다"><i></i></a><a class="tk pub" href="/blog/11-one-mistake-hundred-certainty/" title="2부 제11회 한 사람의 착각, 백 사람의 확신" aria-label="2부 제11회 한 사람의 착각, 백 사람의 확신"><i></i></a><a class="tk pub" href="/blog/12-how-wiki-filters/" title="2부 제12회 위키는 어떻게 틀린 정보를 걸러내는가" aria-label="2부 제12회 위키는 어떻게 틀린 정보를 걸러내는가"><i></i></a><a class="tk pub" href="/blog/13-trust-score/" title="2부 제13회 누구의 신고를 믿을 것인가 — 신뢰 점수" aria-label="2부 제13회 누구의 신고를 믿을 것인가 — 신뢰 점수"><i></i></a></div><div class="comb-g" style="flex:8 1 0%"><a class="tk pub" href="/blog/14-what-vibration-says/" title="3부 제14회 진동은 무엇을 말하는가" aria-label="3부 제14회 진동은 무엇을 말하는가"><i></i></a><a class="tk pub" href="/blog/15-the-accelerometer/" title="3부 제15회 주머니 속 가속도계라는 센서" aria-label="3부 제15회 주머니 속 가속도계라는 센서"><i></i></a><a class="tk pub" href="/blog/16-fourier-transform/" title="3부 제16회 시간을 주파수로 — 푸리에 변환" aria-label="3부 제16회 시간을 주파수로 — 푸리에 변환"><i></i></a><a class="tk pub" href="/blog/17-laplace-system-response/" title="3부 제17회 라플라스 변환과 시스템의 응답" aria-label="3부 제17회 라플라스 변환과 시스템의 응답"><i></i></a><a class="tk pub" href="/blog/18-stop-and-go/" title="3부 제18회 가다서다 — 도심 주행이라는 소음" aria-label="3부 제18회 가다서다 — 도심 주행이라는 소음"><i></i></a><a class="tk pub" href="/blog/19-normalization/" title="3부 제19회 차량마다 다른 조건, 정규화의 문제" aria-label="3부 제19회 차량마다 다른 조건, 정규화의 문제"><i></i></a><a class="tk pub" href="/blog/20-hundreds-of-passes/" title="3부 제20회 같은 지점을 수백 번 지나간다는 것" aria-label="3부 제20회 같은 지점을 수백 번 지나간다는 것"><i></i></a><a class="tk pub" href="/blog/21-faint-signals/" title="3부 제21회 미약한 신호를 건져 올리는 법" aria-label="3부 제21회 미약한 신호를 건져 올리는 법"><i></i></a></div><div class="comb-g" style="flex:6 1 0%"><a class="tk pub" href="/blog/22-learning-rare-events/" title="4부 제22회 드문 재난을 어떻게 학습하는가" aria-label="4부 제22회 드문 재난을 어떻게 학습하는가"><i></i></a><a class="tk pub" href="/blog/23-simulation-data/" title="4부 제23회 시뮬레이션으로 데이터를 만든다" aria-label="4부 제23회 시뮬레이션으로 데이터를 만든다"><i></i></a><a class="tk pub" href="/blog/24-what-is-physical-ai/" title="4부 제24회 physical AI란 무엇인가" aria-label="4부 제24회 physical AI란 무엇인가"><i></i></a><a class="tk pub" href="/blog/25-teaching-the-feel/" title="4부 제25회 사람의 &#x27;물컹함&#x27;을 기계에 가르치기" aria-label="4부 제25회 사람의 &#x27;물컹함&#x27;을 기계에 가르치기"><i></i></a><a class="tk pub" href="/blog/26-people-meet-machine/" title="4부 제26회 사람의 신고와 기계의 신호가 만나면" aria-label="4부 제26회 사람의 신고와 기계의 신호가 만나면"><i></i></a><a class="tk pub" href="/blog/27-threshold-ethics/" title="4부 제27회 오경보와 놓침 사이 — 임계값의 윤리" aria-label="4부 제27회 오경보와 놓침 사이 — 임계값의 윤리"><i></i></a></div><div class="comb-g" style="flex:3 1 0%"><a class="tk pub" href="/blog/28-drawing-the-map/" title="5부 제28회 위험 지도를 그리다" aria-label="5부 제28회 위험 지도를 그리다"><i></i></a><span class="tk on" title="5부 제29회 NumTerra 해부 — 앱과 데이터 파이프라인"><i></i></span><a class="tk pub" href="/blog/30-self-sensing-city/" title="5부 제30회 스스로 감지하는 도시" aria-label="5부 제30회 스스로 감지하는 도시"><i></i></a></div></div></div><div class="prog-track"><i id="prog"></i></div></div><div class="wrap"><article><div class="a-kicker">우리 동네가 먼저 안다<span class="sep">/</span><span class="pt">5부 도시로</span><span class="sep">/</span>제29회</div><h1>NumTerra 해부 — 앱과 데이터 파이프라인</h1><div class="a-meta">2026-08-21 · 읽는 데 9분</div><div class="body"><h2>되는 것과 되게 하려는 것</h2>
+<p>이 편에서는 실제 구조를 정리한다. 그리고 22편에서 정한 원칙에 따라 <strong>현재 동작하는 것과 계획을 구분해서</strong> 적는다.</p>
+<p>이 구분이 흐려지면 나중에 스스로도 무엇을 달성했는지 모르게 된다.</p>
+<h2>앱의 구조</h2>
+<p>앱은 네 부분으로 되어 있다.</p>
+<h3>주행 모드 — 지금 동작</h3>
+<p>차에 탔음을 감지하면 켜진다. 화면을 보지 않아도 되는 상태.</p>
+<p><strong>하는 일</strong>
+- 가속도와 위치를 기록한다 (15편)
+- 큰 충격을 자동 감지해 후보로 표시한다 (9편)
+- 사용자가 버튼을 누르면 그 시점을 표시한다</p>
+<p><strong>설계에서 지킨 것</strong> — 11편의 독립성 원칙. <strong>이 모드에서는 다른 사람의 표시를 보여주지 않는다.</strong> 남의 판단을 보고 나서 판단하면 데이터의 독립성이 무너지기 때문이다.</p>
+<p>이건 편의를 희생한 결정이다. &ldquo;지금 지나는 길에 뭐가 표시돼 있나&rdquo;를 보고 싶은 것이 자연스러운 요구인데 막았다.</p>
+<h3>정리 모드 — 지금 동작</h3>
+<p>주행이 끝난 뒤 쓰는 화면.</p>
+<p><strong>하는 일</strong> — 아까 표시한 지점들이 목록으로 나온다. 하나씩 분류한다. 파인 곳 / 방지턱 / 물컹함 / 기타, 그리고 약간 / 뚜렷.</p>
+<p>9편의 시간 분리 설계다. 주행 중에는 버튼 하나, 정보는 나중에 채운다.</p>
+<p><strong>자동 감지된 후보도 여기 나온다.</strong> 확인하거나 지운다.</p>
+<h3>지도 모드 — 부분 동작</h3>
+<p>28편에서 설계한 지도.</p>
+<p><strong>지금 되는 것</strong> — 신고 위치와 수, 시간 분포, 알려진 구조물 표시.</p>
+<p><strong>아직 안 되는 것</strong> — 신호 기반 판정(26편의 ③ 칸), 데이터 부족 구간 회색 처리의 정확한 계산.</p>
+<h3>기여 기록 — 부분 동작</h3>
+<p>내가 표시한 것들과 그 이후를 본다. 12편의 이력 원칙.</p>
+<p><strong>지금 되는 것</strong> — 내 표시 목록.</p>
+<p><strong>아직 안 되는 것</strong> — 소급 보상(13편). 내 표시가 나중에 다른 사람들에게 인정받았을 때 알려주는 기능.</p>
+<h2>데이터 파이프라인</h2>
+<p>데이터가 지나는 경로를 순서대로 보면 이렇다.</p>
+<pre><code>① 폰에서 측정
+② 폰에서 선별·요약
+③ 서버로 전송
+④ 위치 정렬·정규화
+⑤ 집계
+⑥ 우선순위 산출
+</code></pre>
+<p>각 단계의 현재 상태를 정리한다.</p>
+<h3>① 측정 — 동작</h3>
+<p>초당 수십~수백 회의 가속도, 위치, 속도. 15편에서 정리한 그대로. 방향 정렬(중력 분리)까지 폰에서 한다.</p>
+<h3>② 선별·요약 — 부분 동작</h3>
+<p>18편의 관문이 여기 있다. 속도·가속·조향·폰 자세 조건으로 쓸 수 있는 구간만 남긴다.</p>
+<p><strong>지금 되는 것</strong> — 기본적인 선별. 급가감속 구간 제외, 저속 제외.</p>
+<p><strong>아직 안 되는 것</strong> — 거치 상태 추정과 분류(19편). 이건 데이터를 보고 기준을 정해야 한다.</p>
+<p><strong>요약은 지금 보수적으로 한다.</strong> 15편에서 말한 결정 — 신고 주변 구간의 원본을 넉넉히 남기는 것 — 을 따른다. 나중에 어떤 특징이 중요한지 알게 되었을 때 원본이 없으면 다시 볼 수 없기 때문이다.</p>
+<h3>③ 전송 — 동작</h3>
+<p>와이파이 연결 시 모아서 전송. 13편의 개인정보 원칙에 따라 <strong>전체 경로는 보내지 않는다.</strong> 신고 지점과 그 주변 구간, 그리고 구간별 요약값만.</p>
+<h3>④ 정렬·정규화 — 계획</h3>
+<p>21편의 신호 기반 위치 정렬, 19편의 속도·차량·거치 정규화.</p>
+<p><strong>이 단계가 가장 미완성이다.</strong> 그리고 20편에서 말한 대로 <strong>정규화 없이는 반복이 소용없으므로</strong>, 여기가 2단계로 가는 병목이다.</p>
+<h3>⑤ 집계 — 부분 동작</h3>
+<p>10편의 겹침과 시간 변화. 13편의 신뢰 가중.</p>
+<p><strong>지금 되는 것</strong> — 독립 신고 수 집계, 시간 분포.</p>
+<p><strong>아직 안 되는 것</strong> — 신뢰 점수의 본격 운영. 사용자가 적어서 일치도를 계산할 데이터가 부족하다.</p>
+<h3>⑥ 우선순위 — 부분 동작</h3>
+<p>13편의 지점 점수. 겹침 + 시간 추세 + 신호 뒷받침 + 구조물 제외.</p>
+<p><strong>지금은 앞의 두 항목만</strong> 쓴다. 신호 뒷받침은 ④가 되어야 가능하다.</p>
+<h2>무엇이 병목인가</h2>
+<p>정리하면 병목이 두 개다.</p>
+<p><strong>병목 1: 정규화(④).</strong> 이게 안 되면 여러 차량의 데이터를 겹칠 수 없고, 그러면 반복의 이점을 못 얻는다. 3부에서 만든 도구 대부분이 여기 걸려 있다.</p>
+<p>이건 기술 문제이면서 데이터 문제다. 정규화 기준을 정하려면 여러 차종의 실제 데이터가 필요하다.</p>
+<p><strong>병목 2: 사용자 수.</strong> 신뢰 점수도, 겹침도, 반복도 사용자가 모여야 의미가 생긴다.</p>
+<p><strong>두 병목이 서로 얽혀 있다.</strong> 사용자가 있어야 정규화 기준을 정할 수 있고, 정규화가 되어야 서비스가 쓸모 있어져 사용자가 늘어난다.</p>
+<p>이 얽힘을 푸는 방법은 하나다. <strong>1단계만으로 쓸모 있게 만드는 것.</strong> 7편에서 이야기한 그것이다. 정규화가 안 되어도, 신호 분석이 없어도, 사람들의 신고를 모아 지도에 보여주고 민원 근거로 쓸 수 있게 하는 것.</p>
+<p><strong>그것만으로 쓰이면 데이터가 쌓이고, 병목이 풀린다.</strong></p>
+<h2>규모에 대한 현실적 판단</h2>
+<p>얼마나 필요한가. 10편에서 말한 국지성이 여기서 유리하다.</p>
+<p><strong>전국 서비스로 시작하지 않는다.</strong> 한 동네, 한 통학로에서 시작한다. 같은 길을 매일 지나는 몇십 명.</p>
+<p>그 규모에서 무엇이 되는가.
+- 겹침 판정 — 된다. 같은 구간을 여러 명이 지나므로
+- 시간 변화 — 된다. 몇 달 관측하면
+- 신뢰 점수 — 부분적으로. 표본이 작아 불안정
+- 신호 정규화 — 어렵다. 차종 다양성이 부족</p>
+<p><strong>그래서 초기 목표는 1단계 완성이다.</strong> 2단계는 여러 동네로 확장된 뒤의 일이다.</p>
+<p>다음 편에서 이 연재를 마무리한다.</p>
+<hr />
+<p><strong>다음 편 예고 —</strong> <em>스스로 감지하는 도시.</em> 마지막 편. 서른 편을 정리하고, 이것이 무엇을 향하는지 이야기한다.</p></div><nav class="pnav"><a class="pn prev" href="/blog/28-drawing-the-map/"><span class="lbl">이전 회</span><span class="pn-t">위험 지도를 그리다</span><span class="pn-e">제28회</span></a><a class="pn next" href="/blog/30-self-sensing-city/"><span class="lbl">다음 회</span><span class="pn-t">스스로 감지하는 도시</span><span class="pn-e">제30회</span></a></nav><section class="send"><div class="send-hd">연재 안내</div><p class="send-p">「우리 동네가 먼저 안다」는 <b>5부 30편</b>으로 이어집니다. 지금 읽은 글은 <b>5부 도시로</b>의 2번째(전체 제29회)입니다.</p><details class="fold"><summary>연재 전체 목차 펼쳐보기</summary><div class="fold-in"><section class="part"><div class="part-hd"><span class="part-no">1부</span><h3 class="part-t">왜 못 잡았나</h3><span class="part-rg">1~6회</span></div><ol class="eps"><li class="ep pub"><a href="/blog/01-it-was-fine-yesterday/"><span class="ep-no">01</span><span class="ep-t">그 도로는 어제도 멀쩡했다</span><span class="ep-x"><span class="pfx">읽는 데 </span>8분</span></a></li><li class="ep pub"><a href="/blog/02-old-tech-new-problem/"><span class="ep-no">02</span><span class="ep-t">도로를 재는 기술은 이미 오래됐다, 그런데 왜</span><span class="ep-x"><span class="pfx">읽는 데 </span>9분</span></a></li><li class="ep pub"><a href="/blog/03-pothole-vs-sinkhole/"><span class="ep-no">03</span><span class="ep-t">포트홀과 싱크홀은 다른 문제다</span><span class="ep-x"><span class="pfx">읽는 데 </span>8분</span></a></li><li class="ep pub"><a href="/blog/04-beneath-the-surface/"><span class="ep-no">04</span><span class="ep-t">표면이 아니라 아래에서 일어나는 일</span><span class="ep-x"><span class="pfx">읽는 데 </span>8분</span></a></li><li class="ep pub"><a href="/blog/05-how-cavities-grow/"><span class="ep-no">05</span><span class="ep-t">공동은 어떻게 자라는가</span><span class="ep-x"><span class="pfx">읽는 데 </span>9분</span></a></li><li class="ep pub"><a href="/blog/06-three-walls/"><span class="ep-no">06</span><span class="ep-t">비용·주기·깊이 — 기존 방식의 삼중 한계</span><span class="ep-x"><span class="pfx">읽는 데 </span>8분</span></a></li></ol></section><section class="part"><div class="part-hd"><span class="part-no">2부</span><h3 class="part-t">사람이 먼저</h3><span class="pbadge">1단계</span><span class="part-rg">7~13회</span></div><ol class="eps"><li class="ep pub"><a href="/blog/07-the-daily-commuter/"><span class="ep-no">07</span><span class="ep-t">매일 그 길을 지나는 사람</span><span class="ep-x"><span class="pfx">읽는 데 </span>8분</span></a></li><li class="ep pub"><a href="/blog/08-the-thud/"><span class="ep-no">08</span><span class="ep-t">\&quot;쿵\&quot; 하는 그 순간, 무슨 일이 일어났나</span><span class="ep-x"><span class="pfx">읽는 데 </span>9분</span></a></li><li class="ep pub"><a href="/blog/09-report-button/"><span class="ep-no">09</span><span class="ep-t">느낌을 데이터로 바꾸기 — 신고 버튼의 설계</span><span class="ep-x"><span class="pfx">읽는 데 </span>9분</span></a></li><li class="ep pub"><a href="/blog/10-planting-flags/"><span class="ep-no">10</span><span class="ep-t">동네에 깃발을 꽂다</span><span class="ep-x"><span class="pfx">읽는 데 </span>8분</span></a></li><li class="ep pub"><a href="/blog/11-one-mistake-hundred-certainty/"><span class="ep-no">11</span><span class="ep-t">한 사람의 착각, 백 사람의 확신</span><span class="ep-x"><span class="pfx">읽는 데 </span>9분</span></a></li><li class="ep pub"><a href="/blog/12-how-wiki-filters/"><span class="ep-no">12</span><span class="ep-t">위키는 어떻게 틀린 정보를 걸러내는가</span><span class="ep-x"><span class="pfx">읽는 데 </span>9분</span></a></li><li class="ep pub"><a href="/blog/13-trust-score/"><span class="ep-no">13</span><span class="ep-t">누구의 신고를 믿을 것인가 — 신뢰 점수</span><span class="ep-x"><span class="pfx">읽는 데 </span>9분</span></a></li></ol></section><section class="part"><div class="part-hd"><span class="part-no">3부</span><h3 class="part-t">신호 읽기</h3><span class="part-rg">14~21회</span></div><ol class="eps"><li class="ep pub"><a href="/blog/14-what-vibration-says/"><span class="ep-no">14</span><span class="ep-t">진동은 무엇을 말하는가</span><span class="ep-x"><span class="pfx">읽는 데 </span>9분</span></a></li><li class="ep pub"><a href="/blog/15-the-accelerometer/"><span class="ep-no">15</span><span class="ep-t">주머니 속 가속도계라는 센서</span><span class="ep-x"><span class="pfx">읽는 데 </span>9분</span></a></li><li class="ep pub"><a href="/blog/16-fourier-transform/"><span class="ep-no">16</span><span class="ep-t">시간을 주파수로 — 푸리에 변환</span><span class="ep-x"><span class="pfx">읽는 데 </span>10분</span></a></li><li class="ep pub"><a href="/blog/17-laplace-system-response/"><span class="ep-no">17</span><span class="ep-t">라플라스 변환과 시스템의 응답</span><span class="ep-x"><span class="pfx">읽는 데 </span>9분</span></a></li><li class="ep pub"><a href="/blog/18-stop-and-go/"><span class="ep-no">18</span><span class="ep-t">가다서다 — 도심 주행이라는 소음</span><span class="ep-x"><span class="pfx">읽는 데 </span>9분</span></a></li><li class="ep pub"><a href="/blog/19-normalization/"><span class="ep-no">19</span><span class="ep-t">차량마다 다른 조건, 정규화의 문제</span><span class="ep-x"><span class="pfx">읽는 데 </span>9분</span></a></li><li class="ep pub"><a href="/blog/20-hundreds-of-passes/"><span class="ep-no">20</span><span class="ep-t">같은 지점을 수백 번 지나간다는 것</span><span class="ep-x"><span class="pfx">읽는 데 </span>9분</span></a></li><li class="ep pub"><a href="/blog/21-faint-signals/"><span class="ep-no">21</span><span class="ep-t">미약한 신호를 건져 올리는 법</span><span class="ep-x"><span class="pfx">읽는 데 </span>9분</span></a></li></ol></section><section class="part"><div class="part-hd"><span class="part-no">4부</span><h3 class="part-t">physical AI</h3><span class="pbadge">2단계</span><span class="part-rg">22~27회</span></div><ol class="eps"><li class="ep pub"><a href="/blog/22-learning-rare-events/"><span class="ep-no">22</span><span class="ep-t">드문 재난을 어떻게 학습하는가</span><span class="ep-x"><span class="pfx">읽는 데 </span>9분</span></a></li><li class="ep pub"><a href="/blog/23-simulation-data/"><span class="ep-no">23</span><span class="ep-t">시뮬레이션으로 데이터를 만든다</span><span class="ep-x"><span class="pfx">읽는 데 </span>9분</span></a></li><li class="ep pub"><a href="/blog/24-what-is-physical-ai/"><span class="ep-no">24</span><span class="ep-t">physical AI란 무엇인가</span><span class="ep-x"><span class="pfx">읽는 데 </span>9분</span></a></li><li class="ep pub"><a href="/blog/25-teaching-the-feel/"><span class="ep-no">25</span><span class="ep-t">사람의 &#x27;물컹함&#x27;을 기계에 가르치기</span><span class="ep-x"><span class="pfx">읽는 데 </span>10분</span></a></li><li class="ep pub"><a href="/blog/26-people-meet-machine/"><span class="ep-no">26</span><span class="ep-t">사람의 신고와 기계의 신호가 만나면</span><span class="ep-x"><span class="pfx">읽는 데 </span>9분</span></a></li><li class="ep pub"><a href="/blog/27-threshold-ethics/"><span class="ep-no">27</span><span class="ep-t">오경보와 놓침 사이 — 임계값의 윤리</span><span class="ep-x"><span class="pfx">읽는 데 </span>9분</span></a></li></ol></section><section class="part"><div class="part-hd"><span class="part-no">5부</span><h3 class="part-t">도시로</h3><span class="part-rg">28~30회</span></div><ol class="eps"><li class="ep pub"><a href="/blog/28-drawing-the-map/"><span class="ep-no">28</span><span class="ep-t">위험 지도를 그리다</span><span class="ep-x"><span class="pfx">읽는 데 </span>9분</span></a></li><li class="ep pub cur"><span><span class="ep-no">29</span><span class="ep-t">NumTerra 해부 — 앱과 데이터 파이프라인</span><span class="ep-x">지금 읽는 중</span></span></li><li class="ep pub"><a href="/blog/30-self-sensing-city/"><span class="ep-no">30</span><span class="ep-t">스스로 감지하는 도시</span><span class="ep-x"><span class="pfx">읽는 데 </span>9분</span></a></li></ol></section></div></details></section></article></div><script>
+(function(){var b=document.getElementById('prog');if(!b)return;
+function u(){var h=document.documentElement,s=h.scrollTop||document.body.scrollTop,
+m=(h.scrollHeight-h.clientHeight)||1,r=s/m*100;
+b.style.width=(r<0?0:r>100?100:r)+'%';}
+addEventListener('scroll',u,{passive:true});addEventListener('resize',u);u();})();
+</script>
+<footer><div class="wrap">© NumTerra · <a href="/#toc">연재 전체 목차</a></div></footer>
+</body></html>
